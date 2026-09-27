@@ -1,0 +1,98 @@
+title: Segment Forecast
+subtitle: in millions of USD
+
+columns: [actual_2025, actual_ltm, 2026E, 2027E, 2028E, 2029E, 2030E, 2031E, 2032E, 2033E, 2034E, 2035E]
+
+rows:
+  - label: Space
+    style: header
+  - line: space_revenue
+    label: Revenue
+  - line: space_revenue_growth
+    label: Growth
+    style: supplemental
+    indent: 1
+  - line: space_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+  - line: space_adjusted_ebitda_margin
+    label: Margin
+    style: supplemental
+    indent: 1
+  - line: space_capital_expenditures
+    label: Capital expenditures
+  - line: space_capital_intensity
+    label: Per dollar of revenue
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Connectivity
+    style: header
+  - line: connectivity_revenue
+    label: Revenue
+  - line: connectivity_revenue_growth
+    label: Growth
+    style: supplemental
+    indent: 1
+  - line: connectivity_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+  - line: connectivity_adjusted_ebitda_margin
+    label: Margin
+    style: supplemental
+    indent: 1
+  - line: connectivity_capital_expenditures
+    label: Capital expenditures
+  - line: connectivity_capital_intensity
+    label: Per dollar of revenue
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: AI
+    style: header
+  - line: ai_revenue
+    label: Revenue
+  - line: ai_revenue_growth
+    label: Growth
+    style: supplemental
+    indent: 1
+  - line: ai_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+  - line: ai_adjusted_ebitda_margin
+    label: Margin
+    style: supplemental
+    indent: 1
+  - line: ai_capital_expenditures
+    label: Capital expenditures
+  - line: ai_capital_intensity
+    label: Per dollar of revenue
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Total reportable segments
+    style: header
+  - line: total_revenue
+    label: Revenue
+    style: subtotal
+  - line: total_revenue_growth
+    label: Growth
+    style: supplemental
+    indent: 1
+  - line: total_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+    style: subtotal
+  - line: total_adjusted_ebitda_margin
+    label: Margin
+    style: supplemental
+    indent: 1
+  - line: total_capital_expenditures
+    label: Capital expenditures
+    style: subtotal
+  - line: total_capital_intensity
+    label: Per dollar of revenue
+    style: supplemental
+    indent: 1

@@ -1,0 +1,50 @@
+checks:
+  revenue_across_segments:
+    formula: space_revenue + connectivity_revenue + ai_revenue - total_revenue
+  cost_of_revenue_across_segments:
+    formula: space_cost_of_revenue + connectivity_cost_of_revenue + ai_cost_of_revenue - total_cost_of_revenue
+  research_and_development_across_segments:
+    formula: space_research_and_development + connectivity_research_and_development + ai_research_and_development - total_research_and_development
+  selling_general_and_administrative_across_segments:
+    formula: space_selling_general_and_administrative + connectivity_selling_general_and_administrative + ai_selling_general_and_administrative - total_selling_general_and_administrative
+  restructuring_charges_across_segments:
+    formula: space_restructuring_charges + connectivity_restructuring_charges + ai_restructuring_charges - total_restructuring_charges
+  impairment_across_segments:
+    formula: space_impairment + connectivity_impairment + ai_impairment - total_impairment
+  total_costs_and_expenses_across_segments:
+    formula: space_total_costs_and_expenses + connectivity_total_costs_and_expenses + ai_total_costs_and_expenses - total_total_costs_and_expenses
+  operating_income_across_segments:
+    formula: space_operating_income + connectivity_operating_income + ai_operating_income - total_operating_income
+  depreciation_and_amortization_across_segments:
+    formula: space_depreciation_and_amortization + connectivity_depreciation_and_amortization + ai_depreciation_and_amortization - total_depreciation_and_amortization
+  share_based_compensation_across_segments:
+    formula: space_share_based_compensation + connectivity_share_based_compensation + ai_share_based_compensation - total_share_based_compensation
+  capital_expenditures_across_segments:
+    formula: space_capital_expenditures + connectivity_capital_expenditures + ai_capital_expenditures - total_capital_expenditures
+  adjusted_ebitda_across_segments:
+    formula: space_adjusted_ebitda + connectivity_adjusted_ebitda + ai_adjusted_ebitda - total_adjusted_ebitda
+
+  space_total_costs_and_expenses:
+    formula: space_cost_of_revenue + space_research_and_development + space_selling_general_and_administrative + space_restructuring_charges + space_impairment - space_total_costs_and_expenses
+  connectivity_total_costs_and_expenses:
+    formula: connectivity_cost_of_revenue + connectivity_research_and_development + connectivity_selling_general_and_administrative + connectivity_restructuring_charges + connectivity_impairment - connectivity_total_costs_and_expenses
+  ai_total_costs_and_expenses:
+    formula: ai_cost_of_revenue + ai_research_and_development + ai_selling_general_and_administrative + ai_restructuring_charges + ai_impairment - ai_total_costs_and_expenses
+
+  space_operating_income:
+    formula: space_revenue - space_total_costs_and_expenses - space_operating_income
+  connectivity_operating_income:
+    formula: connectivity_revenue - connectivity_total_costs_and_expenses - connectivity_operating_income
+  ai_operating_income:
+    formula: ai_revenue - ai_total_costs_and_expenses - ai_operating_income
+
+  space_adjusted_ebitda:
+    formula: space_operating_income + space_depreciation_and_amortization + space_share_based_compensation + space_restructuring_charges + space_impairment - space_adjusted_ebitda
+    note: Rebuilds the non-GAAP measure from the segment note alone, tying the MD&A table to the audited note.
+  connectivity_adjusted_ebitda:
+    formula: connectivity_operating_income + connectivity_depreciation_and_amortization + connectivity_share_based_compensation + connectivity_restructuring_charges + connectivity_impairment - connectivity_adjusted_ebitda
+  ai_adjusted_ebitda:
+    formula: ai_operating_income + ai_depreciation_and_amortization + ai_share_based_compensation + ai_restructuring_charges + ai_impairment - ai_adjusted_ebitda
+  total_adjusted_ebitda:
+    formula: total_operating_income + total_depreciation_and_amortization + total_share_based_compensation + total_restructuring_charges + total_impairment - total_adjusted_ebitda
+    expect: 0

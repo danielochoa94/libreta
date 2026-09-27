@@ -1,0 +1,169 @@
+table:
+  title: Consolidated Balance Sheets
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/spcx-20260630.htm#ib0e99459acb642ca82e016ed95816e66_253
+  image: consolidated-balance-sheets.png
+  details:
+    Table: Consolidated Balance Sheets
+    Page: "4"
+    Document: SpaceX Form 10-Q for the quarter ended June 30, 2026
+    Extracted: 2026-09-23
+  note: >
+    The June 30, 2026 column only; December 31, 2025 comes from the prospectus. The first balance sheet after the June
+    2026 IPO, which converted every preferred share into common stock. Unaudited.
+
+defaults:
+  printed: as_is
+
+line_items:
+  cash_and_cash_equivalents:
+    label: Cash and cash equivalents
+    image_regions:
+      Jun 2026: { x: 657, y: 122, width: 36, height: 17 }
+  marketable_securities:
+    label: Marketable securities
+    image_regions:
+      Jun 2026: { x: 663, y: 136, width: 30, height: 17 }
+  accounts_receivable:
+    label: Accounts receivable, net
+    note: Net of allowance for credit losses of $50 and $39 at June 30, 2026 and December 31, 2025, respectively.
+    image_regions:
+      Jun 2026: { x: 663, y: 151, width: 30, height: 17 }
+  inventory:
+    label: Inventory
+    image_regions:
+      Jun 2026: { x: 663, y: 166, width: 30, height: 17 }
+  prepaid_expenses_and_other_current_assets:
+    label: Prepaid expenses and other current assets
+    image_regions:
+      Jun 2026: { x: 663, y: 180, width: 30, height: 17 }
+  total_current_assets:
+    label: Total current assets
+    image_regions:
+      Jun 2026: { x: 652, y: 195, width: 41, height: 17 }
+  property_plant_and_equipment_net:
+    label: Property, plant, and equipment, net
+    note: Carries footnote (a), pointing to Note 17, Related Party Transactions.
+    image_regions:
+      Jun 2026: { x: 657, y: 210, width: 36, height: 17 }
+  finance_lease_right_of_use_assets:
+    label: Finance lease right-of-use assets
+    image_regions:
+      Jun 2026: { x: 663, y: 225, width: 30, height: 17 }
+  intangible_assets_net:
+    label: Intangible assets, net
+    image_regions:
+      Jun 2026: { x: 663, y: 239, width: 30, height: 17 }
+  digital_assets:
+    label: Digital assets
+    image_regions:
+      Jun 2026: { x: 663, y: 254, width: 30, height: 17 }
+  goodwill:
+    label: Goodwill
+    image_regions:
+      Jun 2026: { x: 658, y: 269, width: 35, height: 17 }
+  deferred_tax_assets:
+    label: Deferred tax assets
+    image_regions:
+      Jun 2026: { x: 671, y: 283, width: 22, height: 17 }
+  other_assets:
+    label: Other assets
+    image_regions:
+      Jun 2026: { x: 663, y: 298, width: 30, height: 17 }
+  total_assets:
+    label: Total assets
+    image_regions:
+      Jun 2026: { x: 652, y: 314, width: 41, height: 17 }
+  accounts_payable:
+    label: Accounts payable
+    image_regions:
+      Jun 2026: { x: 663, y: 360, width: 30, height: 17 }
+  deferred_revenue_current:
+    label: Deferred revenue, current
+    image_regions:
+      Jun 2026: { x: 663, y: 374, width: 30, height: 17 }
+  debt_and_finance_leases_current:
+    label: Debt and finance leases, current
+    note: Related party of $2,039 and $455 at June 30, 2026 and December 31, 2025, respectively.
+    image_regions:
+      Jun 2026: { x: 663, y: 389, width: 30, height: 17 }
+  accrued_expenses_and_other_current_liabilities:
+    label: Accrued expenses and other current liabilities
+    image_regions:
+      Jun 2026: { x: 663, y: 404, width: 30, height: 17 }
+  total_current_liabilities:
+    label: Total current liabilities
+    image_regions:
+      Jun 2026: { x: 657, y: 419, width: 36, height: 17 }
+  deferred_revenue_noncurrent:
+    label: Deferred revenue, net of current
+    image_regions:
+      Jun 2026: { x: 663, y: 449, width: 30, height: 17 }
+  debt_and_finance_leases_noncurrent:
+    label: Debt and finance leases, net of current
+    note: Related party of $11,290 and $4,052 at June 30, 2026 and December 31, 2025, respectively.
+    image_regions:
+      Jun 2026: { x: 657, y: 463, width: 36, height: 17 }
+  other_liabilities:
+    label: Other liabilities
+    image_regions:
+      Jun 2026: { x: 663, y: 478, width: 30, height: 17 }
+  total_liabilities:
+    label: Total liabilities
+    image_regions:
+      Jun 2026: { x: 657, y: 493, width: 36, height: 17 }
+  redeemable_convertible_preferred_stock:
+    label: Redeemable convertible preferred stock
+    note: >
+      Par value $0.001; - and 2,351 shares issued; - and 2,046 shares outstanding as of June 30, 2026 and December 31,
+      2025, respectively.
+    image_regions:
+      Jun 2026: { x: 676, y: 548, width: 17, height: 17 }
+  preferred_stock:
+    label: Preferred stock
+    missing: zero
+    note: Par value $0.001; no shares issued and outstanding. Authorized by the charter adopted at the IPO.
+    image_regions:
+      Jun 2026: { x: 676, y: 577, width: 17, height: 17 }
+  class_a_common_stock:
+    label: Class A common stock
+    note: >
+      Par value $0.001; 7,607 and 2,036 shares issued; 7,607 and 1,952 shares outstanding as of June 30, 2026 and
+      December 31, 2025, respectively.
+    image_regions:
+      Jun 2026: { x: 681, y: 603, width: 12, height: 17 }
+  class_b_common_stock:
+    label: Class B common stock
+    note: >
+      Par value $0.001; 5,569 and 644 shares issued and outstanding as of June 30, 2026 and December 31, 2025,
+      respectively.
+    image_regions:
+      Jun 2026: { x: 681, y: 628, width: 12, height: 17 }
+  class_c_common_stock:
+    label: Class C common stock
+    note: Reclassified into Class A common stock at the IPO.
+    image_regions:
+      Jun 2026: { x: 676, y: 653, width: 17, height: 17 }
+  additional_paid_in_capital:
+    label: Additional paid-in capital
+    image_regions:
+      Jun 2026: { x: 652, y: 668, width: 41, height: 17 }
+  accumulated_deficit:
+    label: Accumulated deficit
+    printed: negated
+    sign: contra
+    image_regions:
+      Jun 2026: { x: 653, y: 683, width: 43, height: 17 }
+  accumulated_other_comprehensive_income:
+    label: Accumulated other comprehensive income
+    image_regions:
+      Jun 2026: { x: 663, y: 697, width: 30, height: 17 }
+  total_shareholders_equity:
+    label: Total shareholders' equity
+    image_regions:
+      Jun 2026: { x: 652, y: 715, width: 41, height: 17 }
+  total_liabilities_preferred_and_equity:
+    label: Total liabilities, redeemable convertible preferred stock, and shareholders' equity
+    image_regions:
+      Jun 2026: { x: 652, y: 730, width: 41, height: 17 }

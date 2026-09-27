@@ -1,0 +1,132 @@
+title: Balance Sheet
+subtitle: in millions of USD
+
+columns:
+  - source: 2024
+    note: December 31
+  - source: 2025
+    note: December 31
+  - source: Jun 2026
+    note: June 30, unaudited. The first balance sheet after the IPO.
+
+rows:
+  - label: Current assets
+    style: header
+  - line: cash_and_cash_equivalents
+    indent: 1
+  - line: marketable_securities
+    indent: 1
+  - line: accounts_receivable
+    indent: 1
+  - line: inventory
+    indent: 1
+  - line: prepaid_expenses_and_other_current_assets
+    indent: 1
+  - line: total_current_assets
+    style: subtotal
+
+  - space: compact
+
+  - line: property_plant_and_equipment_net
+    indent: 1
+  - line: finance_lease_right_of_use_assets
+    indent: 1
+  - line: intangible_assets_net
+    indent: 1
+  - line: digital_assets
+    indent: 1
+  - line: goodwill
+    indent: 1
+  - line: deferred_tax_assets
+    indent: 1
+  - line: other_assets
+    indent: 1
+  - line: total_assets
+    style: total
+  - line: total_assets_growth
+    label: Total assets growth
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Current liabilities
+    style: header
+  - line: accounts_payable
+    indent: 1
+  - line: deferred_revenue_current
+    indent: 1
+  - line: debt_and_finance_leases_current
+    indent: 1
+  - line: accrued_expenses_and_other_current_liabilities
+    indent: 1
+  - line: total_current_liabilities
+    style: subtotal
+  - line: working_capital
+    label: Working capital
+    style: supplemental
+    indent: 1
+  - line: current_ratio
+    label: Current ratio
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: deferred_revenue_noncurrent
+    indent: 1
+  - line: debt_and_finance_leases_noncurrent
+    indent: 1
+  - line: other_liabilities
+    indent: 1
+  - line: total_liabilities
+    style: subtotal
+  - line: total_debt
+    label: Total debt and finance leases
+    style: supplemental
+    indent: 1
+  - line: net_debt
+    label: Net debt
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: redeemable_convertible_preferred_stock
+
+  - space: compact
+
+  - label: Shareholders' equity
+    style: header
+  - line: preferred_stock
+    indent: 1
+  - line: class_a_common_stock
+    indent: 1
+  - line: class_b_common_stock
+    indent: 1
+  - line: class_c_common_stock
+    indent: 1
+  - line: class_d_common_stock
+    indent: 1
+  - line: additional_paid_in_capital
+    indent: 1
+  - line: accumulated_deficit
+    indent: 1
+  - line: accumulated_other_comprehensive_income
+    indent: 1
+  - line: total_shareholders_equity
+    style: subtotal
+  - line: tangible_book_value
+    label: Tangible book value
+    style: supplemental
+    indent: 1
+  - line: total_capitalization
+    label: Total capitalization
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: total_liabilities_preferred_and_equity
+    label: Total liabilities, preferred stock, and equity
+    style: total

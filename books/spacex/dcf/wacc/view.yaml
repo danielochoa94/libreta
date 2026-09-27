@@ -1,0 +1,77 @@
+title: WACC
+subtitle: weighted average cost of capital
+
+columns: [Value]
+
+rows:
+  - label: Beta
+    style: header
+  - line: space_unlevered_beta
+    label: Space, Aerospace/Defense
+    indent: 1
+  - line: connectivity_unlevered_beta
+    label: Connectivity, Telecom (Wireless)
+    indent: 1
+  - line: ai_unlevered_beta
+    label: AI, Software (Internet)
+    indent: 1
+  - line: space_weight
+    label: Space weight
+    style: supplemental
+    indent: 1
+  - line: connectivity_weight
+    label: Connectivity weight
+    style: supplemental
+    indent: 1
+  - line: ai_weight
+    label: AI weight
+    style: supplemental
+    indent: 1
+  - line: unlevered_beta
+    style: subtotal
+  - line: debt_to_equity
+    indent: 1
+  - line: levered_beta
+    style: subtotal
+
+  - space: compact
+
+  - label: Cost of equity
+    style: header
+  - line: risk_free_rate
+    label: Risk-free rate
+    indent: 1
+  - line: levered_beta
+    indent: 1
+  - line: equity_risk_premium
+    label: Equity risk premium
+    indent: 1
+  - line: cost_of_equity
+    style: subtotal
+
+  - space: compact
+
+  - label: Cost of debt
+    style: header
+  - line: pre_tax_cost_of_debt
+    label: Pre-tax cost of debt
+    indent: 1
+  - line: tax_rate
+    indent: 1
+  - line: after_tax_cost_of_debt
+    style: subtotal
+
+  - space: compact
+
+  - label: Capital structure at market value
+    style: header
+  - line: market_value_of_equity
+    indent: 1
+  - line: debt_and_finance_leases
+    indent: 1
+  - line: equity_weight
+    indent: 1
+  - line: debt_weight
+    indent: 1
+  - line: wacc
+    style: total

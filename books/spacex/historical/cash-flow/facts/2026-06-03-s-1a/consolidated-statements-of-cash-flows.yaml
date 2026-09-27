@@ -1,0 +1,276 @@
+table:
+  title: Consolidated Statements of Cash Flows
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026040364/spaceexplorationtechnologib.htm#id286866c4c474ba490d6531a57db9e93_1663
+  image: consolidated-statements-of-cash-flows.png
+  details:
+    Table: Consolidated Statements of Cash Flows
+    Page: F-8
+    Document: SpaceX 2026 S-1/A
+    Extracted: 2026-08-08
+
+defaults:
+  printed: as_is
+
+line_items:
+  net_income:
+    label: Net income (loss)
+    image_regions:
+      2025: { x: 504, y: 123, width: 45, height: 19 }
+      2024: { x: 609, y: 123, width: 26, height: 19 }
+      2023: { x: 686, y: 123, width: 45, height: 19 }
+  depreciation_and_amortization:
+    label: Depreciation and amortization
+    image_regions:
+      2025: { x: 508, y: 173, width: 36, height: 19 }
+      2024: { x: 599, y: 173, width: 36, height: 19 }
+      2023: { x: 690, y: 173, width: 36, height: 19 }
+  share_based_compensation:
+    label: Share-based compensation
+    image_regions:
+      2025: { x: 508, y: 192, width: 36, height: 19 }
+      2024: { x: 609, y: 192, width: 26, height: 19 }
+      2023: { x: 700, y: 192, width: 26, height: 19 }
+  intangible_asset_impairment:
+    label: Intangible asset impairment
+    image_regions:
+      2025: { x: 525, y: 211, width: 20, height: 19 }
+      2024: { x: 616, y: 211, width: 20, height: 19 }
+      2023: { x: 690, y: 211, width: 36, height: 19 }
+  deferred_income_taxes:
+    label: Deferred income taxes
+    image_regions:
+      2025: { x: 518, y: 230, width: 26, height: 19 }
+      2024: { x: 605, y: 230, width: 35, height: 19 }
+      2023: { x: 696, y: 230, width: 35, height: 19 }
+  unrealized_gain_loss_on_digital_assets:
+    label: Unrealized (gain) loss on digital assets
+    image_regions:
+      2025: { x: 518, y: 249, width: 26, height: 19 }
+      2024: { x: 605, y: 249, width: 35, height: 19 }
+      2023: { x: 707, y: 249, width: 20, height: 19 }
+  impairment_and_loss_on_disposal_of_fixed_assets:
+    label: Impairment and loss on disposal of fixed assets, net
+    image_regions:
+      2025: { x: 525, y: 268, width: 20, height: 19 }
+      2024: { x: 609, y: 268, width: 26, height: 19 }
+      2023: { x: 707, y: 268, width: 20, height: 19 }
+  amortization_of_debt_discount_and_issuance_costs:
+    label: Amortization of debt discount and issuance costs
+    image_regions:
+      2025: { x: 525, y: 287, width: 20, height: 19 }
+      2024: { x: 616, y: 287, width: 20, height: 19 }
+      2023: { x: 700, y: 287, width: 26, height: 19 }
+  other_operating_adjustments:
+    label: Other
+    image_regions:
+      2025: { x: 525, y: 306, width: 20, height: 19 }
+      2024: { x: 609, y: 306, width: 26, height: 19 }
+      2023: { x: 700, y: 306, width: 26, height: 19 }
+  change_in_accounts_receivable:
+    label: Accounts receivable
+    image_regions:
+      2025: { x: 514, y: 344, width: 35, height: 19 }
+      2024: { x: 605, y: 344, width: 35, height: 19 }
+      2023: { x: 700, y: 344, width: 26, height: 19 }
+  change_in_inventory:
+    label: Inventory
+    image_regions:
+      2025: { x: 514, y: 363, width: 35, height: 19 }
+      2024: { x: 605, y: 363, width: 35, height: 19 }
+      2023: { x: 702, y: 363, width: 29, height: 19 }
+  change_in_prepaid_expenses_and_other_assets:
+    label: Prepaid expenses and other assets
+    image_regions:
+      2025: { x: 514, y: 382, width: 35, height: 19 }
+      2024: { x: 605, y: 382, width: 35, height: 19 }
+      2023: { x: 707, y: 382, width: 20, height: 19 }
+  change_in_accounts_payable:
+    label: Accounts payable
+    image_regions:
+      2025: { x: 518, y: 401, width: 26, height: 19 }
+      2024: { x: 609, y: 401, width: 26, height: 19 }
+      2023: { x: 700, y: 401, width: 26, height: 19 }
+  change_in_deferred_revenue:
+    label: Deferred revenue
+    image_regions:
+      2025: { x: 508, y: 420, width: 36, height: 19 }
+      2024: { x: 599, y: 420, width: 36, height: 19 }
+      2023: { x: 690, y: 420, width: 36, height: 19 }
+  change_in_operating_lease_liabilities_net:
+    label: Operating lease liabilities, net
+    image_regions:
+      2025: { x: 520, y: 439, width: 29, height: 19 }
+      2024: { x: 611, y: 439, width: 29, height: 19 }
+      2023: { x: 702, y: 439, width: 29, height: 19 }
+  change_in_other_liabilities:
+    label: Other liabilities
+    image_regions:
+      2025: { x: 508, y: 458, width: 36, height: 19 }
+      2024: { x: 609, y: 458, width: 26, height: 19 }
+      2023: { x: 696, y: 458, width: 35, height: 19 }
+  net_cash_from_operating_activities:
+    label: Net cash provided by operating activities
+    image_regions:
+      2025: { x: 508, y: 477, width: 36, height: 19 }
+      2024: { x: 599, y: 477, width: 36, height: 19 }
+      2023: { x: 690, y: 477, width: 36, height: 19 }
+  purchases_of_property_plant_and_equipment:
+    label: Purchases of property, plant, and equipment
+    note: Related party of $666, $171, and $11 for December 31, 2025, 2024, and 2023, respectively.
+    image_regions:
+      2025: { x: 497, y: 541, width: 52, height: 19 }
+      2024: { x: 588, y: 541, width: 52, height: 19 }
+      2023: { x: 686, y: 541, width: 45, height: 19 }
+  capitalized_interest:
+    label: Capitalized interest
+    image_regions:
+      2025: { x: 514, y: 560, width: 35, height: 19 }
+      2024: { x: 616, y: 560, width: 20, height: 19 }
+      2023: { x: 707, y: 560, width: 20, height: 19 }
+  proceeds_from_product_rebates:
+    label: Proceeds from product rebates
+    image_regions:
+      2025: { x: 518, y: 579, width: 26, height: 19 }
+      2024: { x: 616, y: 579, width: 20, height: 19 }
+      2023: { x: 707, y: 579, width: 20, height: 19 }
+  purchases_of_marketable_securities:
+    label: Purchases of marketable securities
+    image_regions:
+      2025: { x: 514, y: 598, width: 35, height: 19 }
+      2024: { x: 595, y: 598, width: 45, height: 19 }
+      2023: { x: 686, y: 598, width: 45, height: 19 }
+  maturities_of_marketable_securities:
+    label: Maturities of marketable securities
+    image_regions:
+      2025: { x: 518, y: 617, width: 26, height: 19 }
+      2024: { x: 599, y: 617, width: 36, height: 19 }
+      2023: { x: 690, y: 617, width: 36, height: 19 }
+  proceeds_from_sales_of_marketable_securities:
+    label: Proceeds from sales of marketable securities
+    image_regions:
+      2025: { x: 508, y: 636, width: 36, height: 19 }
+      2024: { x: 609, y: 636, width: 26, height: 19 }
+      2023: { x: 700, y: 636, width: 26, height: 19 }
+  investments_in_unconsolidated_affiliates:
+    label: Investments in unconsolidated affiliates
+    image_regions:
+      2025: { x: 520, y: 655, width: 29, height: 19 }
+      2024: { x: 616, y: 655, width: 20, height: 19 }
+      2023: { x: 707, y: 655, width: 20, height: 19 }
+  other_investing_activities_net:
+    label: Other investing activities, net
+    image_regions:
+      2025: { x: 520, y: 674, width: 29, height: 19 }
+      2024: { x: 622, y: 674, width: 13, height: 19 }
+      2023: { x: 707, y: 674, width: 20, height: 19 }
+  net_cash_from_investing_activities:
+    label: Net cash used in investing activities
+    image_regions:
+      2025: { x: 497, y: 693, width: 52, height: 19 }
+      2024: { x: 588, y: 693, width: 52, height: 19 }
+      2023: { x: 686, y: 693, width: 45, height: 19 }
+  principal_repayments_on_finance_leases:
+    label: Principal repayments on finance leases
+    image_regions:
+      2025: { x: 514, y: 731, width: 35, height: 19 }
+      2024: { x: 605, y: 731, width: 35, height: 19 }
+      2023: { x: 707, y: 731, width: 20, height: 19 }
+  proceeds_from_debt_and_other_financing_obligations:
+    label: Proceeds from debt and other financing obligations
+    image_regions:
+      2025: { x: 501, y: 750, width: 43, height: 19 }
+      2024: { x: 616, y: 750, width: 20, height: 19 }
+      2023: { x: 707, y: 750, width: 20, height: 19 }
+  payment_of_debt_issuance_costs:
+    label: Payment of debt issuance costs
+    image_regions:
+      2025: { x: 520, y: 769, width: 29, height: 19 }
+      2024: { x: 616, y: 769, width: 20, height: 19 }
+      2023: { x: 707, y: 769, width: 20, height: 19 }
+  repayments_on_debt_and_other_financing_obligations:
+    label: Repayments on debt and other financing obligations
+    image_regions:
+      2025: { x: 504, y: 788, width: 45, height: 19 }
+      2024: { x: 611, y: 788, width: 29, height: 19 }
+      2023: { x: 696, y: 788, width: 35, height: 19 }
+  proceeds_from_issuance_of_capital_stock:
+    label: Proceeds from issuance of capital stock, net of issuance costs
+    image_regions:
+      2025: { x: 501, y: 807, width: 43, height: 19 }
+      2024: { x: 592, y: 807, width: 43, height: 19 }
+      2023: { x: 700, y: 807, width: 26, height: 19 }
+  proceeds_from_employee_equity_award_plans:
+    label: Proceeds from employee equity award plans
+    image_regions:
+      2025: { x: 518, y: 826, width: 26, height: 19 }
+      2024: { x: 609, y: 826, width: 26, height: 19 }
+      2023: { x: 700, y: 826, width: 26, height: 19 }
+  payments_for_repurchase_of_stock:
+    label: Payments for repurchase of common and redeemable convertible preferred stock
+    image_regions:
+      2025: { x: 504, y: 1128, width: 45, height: 19 }
+      2024: { x: 595, y: 1128, width: 45, height: 19 }
+      2023: { x: 696, y: 1128, width: 35, height: 19 }
+  taxes_paid_for_net_share_settlement:
+    label: Taxes paid related to net share settlement of equity award
+    image_regions:
+      2025: { x: 514, y: 1147, width: 35, height: 19 }
+      2024: { x: 605, y: 1147, width: 35, height: 19 }
+      2023: { x: 696, y: 1147, width: 35, height: 19 }
+  net_cash_from_financing_activities:
+    label: Net cash provided by financing activities
+    image_regions:
+      2025: { x: 501, y: 1166, width: 43, height: 19 }
+      2024: { x: 592, y: 1166, width: 43, height: 19 }
+      2023: { x: 700, y: 1166, width: 26, height: 19 }
+  effect_of_exchange_rate_changes_on_cash:
+    label: Effect of exchange rate changes on cash and cash equivalents
+    image_regions:
+      2025: { x: 525, y: 1185, width: 20, height: 19 }
+      2024: { x: 622, y: 1185, width: 13, height: 19 }
+      2023: { x: 709, y: 1185, width: 22, height: 19 }
+  net_change_in_cash:
+    label: Net change in cash and cash equivalents and restricted cash
+    image_regions:
+      2025: { x: 501, y: 1204, width: 43, height: 19 }
+      2024: { x: 599, y: 1204, width: 36, height: 19 }
+      2023: { x: 707, y: 1204, width: 20, height: 19 }
+  cash_and_restricted_cash_beginning_of_year:
+    label: Cash and cash equivalents and restricted cash, beginning of year
+    image_regions:
+      2025: { x: 501, y: 1223, width: 43, height: 19 }
+      2024: { x: 599, y: 1223, width: 36, height: 19 }
+      2023: { x: 690, y: 1223, width: 36, height: 19 }
+  cash_and_restricted_cash_end_of_year:
+    label: Cash and cash equivalents and restricted cash, end of year
+    image_regions:
+      2025: { x: 501, y: 1242, width: 43, height: 19 }
+      2024: { x: 592, y: 1242, width: 43, height: 19 }
+      2023: { x: 690, y: 1242, width: 36, height: 19 }
+  cash_paid_for_interest_net_of_capitalized:
+    label: Interest, net of interest capitalized
+    note: Supplemental disclosure below the statement on page F-9, outside every section's sum.
+    image_regions:
+      2025: { x: 508, y: 1299, width: 36, height: 19 }
+      2024: { x: 599, y: 1299, width: 36, height: 19 }
+      2023: { x: 690, y: 1299, width: 36, height: 19 }
+  cash_paid_for_income_taxes_net:
+    label: Income taxes, net
+    image_regions:
+      2025: { x: 518, y: 1318, width: 26, height: 19 }
+      2024: { x: 609, y: 1318, width: 26, height: 19 }
+      2023: { x: 707, y: 1318, width: 20, height: 19 }
+  share_based_compensation_capitalized_in_property_plant_and_equipment:
+    label: Share-based compensation capitalized in property, plant, and equipment, net
+    image_regions:
+      2025: { x: 518, y: 1380, width: 26, height: 19 }
+      2024: { x: 609, y: 1380, width: 26, height: 19 }
+      2023: { x: 700, y: 1380, width: 26, height: 19 }
+  property_plant_and_equipment_in_accounts_payable:
+    label: Acquisition of property, plant, and equipment included in accounts payable
+    image_regions:
+      2025: { x: 508, y: 1411, width: 36, height: 19 }
+      2024: { x: 599, y: 1411, width: 36, height: 19 }
+      2023: { x: 700, y: 1411, width: 26, height: 19 }

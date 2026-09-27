@@ -1,0 +1,80 @@
+title: Assumptions
+subtitle: forecast drivers
+
+columns:
+  - Space
+  - Connectivity
+  - AI
+  - source: Value
+    label: Company
+
+rows:
+  - label: Revenue
+    style: header
+  - line: revenue_growth_first_year
+    label: Growth, 2026
+    indent: 1
+  - line: revenue_growth_long_run
+    label: Growth, long run
+    indent: 1
+  - line: revenue_growth_fade
+    label: Fade
+    indent: 1
+
+  - space: compact
+
+  - label: Segment Adjusted EBITDA margin
+    style: header
+  - line: adjusted_ebitda_margin_first_year
+    label: Margin, 2026
+    indent: 1
+  - line: adjusted_ebitda_margin_long_run
+    label: Margin, long run
+    indent: 1
+  - line: adjusted_ebitda_margin_fade
+    label: Fade
+    indent: 1
+
+  - space: compact
+
+  - label: Capital expenditures per dollar of revenue
+    style: header
+  - line: capital_intensity_first_year
+    label: Intensity, 2026
+    indent: 1
+  - line: capital_intensity_long_run
+    label: Intensity, long run
+    indent: 1
+  - line: capital_intensity_fade
+    label: Fade
+    indent: 1
+
+  - space: compact
+
+  - label: Share-based compensation as % of revenue
+    style: header
+  - line: share_based_compensation_first_year
+    label: 2026
+    indent: 1
+  - line: share_based_compensation_long_run
+    label: Long run
+    indent: 1
+  - line: share_based_compensation_fade
+    label: Fade
+    indent: 1
+
+  - space: compact
+
+  - label: Reinvestment and taxes
+    style: header
+  - line: depreciation_rate
+    indent: 1
+  - line: working_capital_as_percent_of_incremental_revenue
+    indent: 1
+  - line: tax_rate
+    indent: 1
+  - line: net_operating_loss_utilization_limit
+    indent: 1
+  - line: federal_net_operating_loss_carryforwards
+    label: Federal NOLs at December 31, 2025
+    indent: 1

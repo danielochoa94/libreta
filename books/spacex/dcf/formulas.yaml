@@ -1,0 +1,52 @@
+formulas:
+  present_value_of_forecast_cash_flows:
+    formula: sum(dcf.discounted_cash_flow.present_value_of_unlevered_free_cash_flow["2026E":"2035E"])
+  present_value_of_terminal_value:
+    formula: dcf.terminal_value.present_value_of_terminal_value
+  enterprise_value:
+    formula: present_value_of_forecast_cash_flows + present_value_of_terminal_value
+  terminal_value_share_of_enterprise_value:
+    label: Terminal value share
+    formula: present_value_of_terminal_value / enterprise_value
+    units: percent
+
+  cash_and_marketable_securities:
+    formula: historical.balance_sheet.cash_and_cash_equivalents["Jun 2026"] + historical.balance_sheet.marketable_securities["Jun 2026"]
+  debt_and_finance_leases:
+    formula: historical.balance_sheet.total_debt["Jun 2026"]
+  equity_value:
+    formula: enterprise_value + cash_and_marketable_securities - debt_and_finance_leases
+    note: >
+      Excludes the agreed Cursor acquisition and the EchoStar spectrum purchase, which had not closed at June 30, 2026
+      and are paid largely in new shares.
+
+  basic_shares_outstanding:
+    formula: class_a_shares_outstanding + class_b_shares_outstanding
+    units: millions_of_shares
+  dilutive_options:
+    formula: class_a_options * max(1 - class_a_option_exercise_price / share_price, 0) + class_b_options * max(1 - class_b_option_exercise_price / share_price, 0)
+    units: millions_of_shares
+    note: Treasury stock method at the market price, which assumes exercise proceeds buy back shares.
+  restricted_stock_units:
+    formula: class_a_restricted_stock_units + class_b_restricted_stock_units + class_a_restricted_stock_units_granted_after_march
+    units: millions_of_shares
+  diluted_shares:
+    formula: basic_shares_outstanding + dilutive_options + restricted_stock_units
+    units: millions_of_shares
+
+  value_per_share:
+    formula: equity_value / diluted_shares
+    units: dollars_per_share
+  premium_to_share_price:
+    label: Premium (discount) to share price
+    formula: value_per_share / share_price - 1
+    units: percent
+    note: >
+      Damodaran's post-prospectus valuation came to about $100 a share. The AI sensitivity shows what the market price
+      needs: AI growth that fades far more slowly than in this base case, at margins near the long-run assumption.
+
+  market_capitalization:
+    formula: share_price * diluted_shares
+  market_enterprise_value:
+    label: Market-implied enterprise value
+    formula: market_capitalization - cash_and_marketable_securities + debt_and_finance_leases

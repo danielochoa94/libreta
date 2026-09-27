@@ -1,0 +1,80 @@
+formulas:
+  gross_profit:
+    formula: revenue - cost_of_revenue
+  gross_margin:
+    formula: gross_profit / revenue
+    units: percent
+  operating_margin:
+    formula: operating_income / revenue
+    units: percent
+  net_margin:
+    formula: net_income / revenue
+    units: percent
+
+  revenue_growth:
+    formula: revenue / prior(revenue) - 1
+    units: percent
+
+  adjusted_ebitda:
+    label: Adjusted EBITDA
+    formula: operating_income + historical.segments.total_depreciation_and_amortization + historical.segments.total_share_based_compensation + restructuring_charges + impairment
+    note: >
+      The company's non-GAAP measure: operating income before depreciation and amortization, share-based compensation,
+      restructuring and impairment. The add-backs come from the segment note, and the segment checks tie the result to
+      the figure the company prints.
+  adjusted_ebitda_margin:
+    label: Adjusted EBITDA margin
+    formula: adjusted_ebitda / revenue
+    units: percent
+
+  earnings_withheld_from_common:
+    formula: net_income - net_income_attributable_to_shareholders_basic
+    note: >
+      What the preferred stack absorbed before common shareholders saw anything. In 2024 it took 773 of 791 in net
+      income, which is why EPS was a cent in a profitable year.
+
+column_formulas:
+  cagr:
+    label: CAGR
+    formula: (self["2025"] / self["2023"]) ^ (1 / 2) - 1
+    units: percent
+    note: Compound annual growth from 2023 to 2025.
+  ltm:
+    label: LTM Jun 2026
+    formula: self["2025"] - self["H1 2025"] + self["H1 2026"]
+    applies_to: facts
+    note: >
+      The twelve months to June 30, 2026: fiscal 2025, less the first half of 2025, plus the first half of 2026. Margins
+      divide bridged amounts rather than bridging the margins.
+
+cell_overrides:
+  revenue_growth:
+    H1 2025:
+      blank: true
+      note: The filings give no first half of 2024 to compare against.
+    cagr:
+      blank: true
+  gross_margin:
+    cagr:
+      blank: true
+  operating_margin:
+    cagr:
+      blank: true
+  operating_income:
+    cagr:
+      blank: true
+  other_income_expense_net:
+    cagr:
+      blank: true
+  pretax_income:
+    cagr:
+      blank: true
+  net_income:
+    cagr:
+      blank: true
+  net_margin:
+    cagr:
+      blank: true
+  adjusted_ebitda_margin:
+    cagr:
+      blank: true

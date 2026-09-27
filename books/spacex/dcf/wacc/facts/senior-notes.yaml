@@ -1,0 +1,24 @@
+table:
+  title: Debt Agreements, SpaceX Notes
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/spcx-20260630.htm#ib0e99459acb642ca82e016ed95816e66_52
+  image: senior-notes.png
+  details:
+    Section: Liquidity and Capital Resources, Debt Agreements
+    Page: "48"
+    Document: SpaceX Form 10-Q for the quarter ended June 30, 2026
+    Extracted: 2026-09-23
+  note: Stated in the text rather than in a table.
+
+defaults:
+  units: percent
+
+line_items:
+  pre_tax_cost_of_debt:
+    label: Weighted average coupon interest rate
+    note: >
+      On the $25,000 of senior unsecured notes issued in June 2026 in five tranches maturing from 2031 to 2056. Issued
+      days before the valuation date, so the coupon is the market rate then.
+    image_regions:
+      Value: { x: 680, y: 7, width: 46, height: 19 }

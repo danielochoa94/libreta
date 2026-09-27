@@ -1,0 +1,123 @@
+title: Segments
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025, H1 2025, H1 2026, ltm]
+
+rows:
+  - label: Revenue
+    style: header
+  - line: space_revenue
+    label: Space
+    indent: 1
+  - line: connectivity_revenue
+    label: Connectivity
+    indent: 1
+  - line: ai_revenue
+    label: AI
+    indent: 1
+  - line: total_revenue
+    label: Total reportable segments
+    style: subtotal
+  - line: total_revenue_growth
+    label: Revenue growth
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Operating income (loss)
+    style: header
+  - line: space_operating_income
+    label: Space
+    indent: 1
+  - line: connectivity_operating_income
+    label: Connectivity
+    indent: 1
+  - line: ai_operating_income
+    label: AI
+    indent: 1
+  - line: total_operating_income
+    label: Total reportable segments
+    style: subtotal
+  - line: space_operating_margin
+    label: Space margin
+    style: supplemental
+    indent: 1
+  - line: connectivity_operating_margin
+    label: Connectivity margin
+    style: supplemental
+    indent: 1
+  - line: ai_operating_margin
+    label: AI margin
+    style: supplemental
+    indent: 1
+  - line: total_operating_margin
+    label: Total operating margin
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Segment Adjusted EBITDA
+    style: header
+  - line: space_adjusted_ebitda
+    label: Space
+    indent: 1
+  - line: connectivity_adjusted_ebitda
+    label: Connectivity
+    indent: 1
+  - line: ai_adjusted_ebitda
+    label: AI
+    indent: 1
+  - line: total_adjusted_ebitda
+    label: Total reportable segments
+    style: subtotal
+  - line: space_adjusted_ebitda_margin
+    label: Space margin
+    style: supplemental
+    indent: 1
+  - line: connectivity_adjusted_ebitda_margin
+    label: Connectivity margin
+    style: supplemental
+    indent: 1
+  - line: ai_adjusted_ebitda_margin
+    label: AI margin
+    style: supplemental
+    indent: 1
+  - line: total_adjusted_ebitda_margin
+    label: Total Adjusted EBITDA margin
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Capital investment
+    style: header
+  - line: space_capital_expenditures
+    label: Space
+    indent: 1
+  - line: connectivity_capital_expenditures
+    label: Connectivity
+    indent: 1
+  - line: ai_capital_expenditures
+    label: AI
+    indent: 1
+  - line: total_capital_expenditures
+    label: Total reportable segments
+    style: subtotal
+  - line: space_capital_intensity
+    label: Space capital intensity
+    style: supplemental
+    indent: 1
+  - line: connectivity_capital_intensity
+    label: Connectivity capital intensity
+    style: supplemental
+    indent: 1
+  - line: ai_capital_intensity
+    label: AI capital intensity
+    style: supplemental
+    indent: 1
+  - line: total_capital_intensity
+    label: Total capital intensity
+    style: supplemental
+    indent: 1

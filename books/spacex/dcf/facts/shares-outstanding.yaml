@@ -1,0 +1,28 @@
+table:
+  title: Consolidated Balance Sheets
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/spcx-20260630.htm#ib0e99459acb642ca82e016ed95816e66_253
+  image: shares-outstanding.png
+  details:
+    Table: Consolidated Balance Sheets
+    Page: "4"
+    Document: SpaceX Form 10-Q for the quarter ended June 30, 2026
+    Extracted: 2026-09-23
+  note: From the share counts printed beside each class of common stock, at June 30, 2026.
+
+defaults:
+  units: millions_of_shares
+
+line_items:
+  class_a_shares_outstanding:
+    label: Class A common stock, shares outstanding
+    image_regions:
+      Value: { x: 332, y: 610, width: 28, height: 17 }
+  class_b_shares_outstanding:
+    label: Class B common stock, shares issued and outstanding
+    note: >
+      Includes 1,302 restricted Class B shares held by Elon Musk that vest only on market capitalization milestones
+      and a Mars colony or space-based data centers. They are counted because they are outstanding and vote.
+    image_regions:
+      Value: { x: 203, y: 635, width: 28, height: 17 }

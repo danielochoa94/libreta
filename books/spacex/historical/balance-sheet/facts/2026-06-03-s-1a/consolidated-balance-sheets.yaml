@@ -1,0 +1,200 @@
+table:
+  title: Consolidated Balance Sheets
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026040364/spaceexplorationtechnologib.htm#id286866c4c474ba490d6531a57db9e93_1622
+  image: consolidated-balance-sheets.png
+  details:
+    Table: Consolidated Balance Sheets
+    Page: F-4
+    Document: SpaceX 2026 S-1/A
+    Extracted: 2026-08-08
+
+defaults:
+  printed: as_is
+
+line_items:
+  cash_and_cash_equivalents:
+    label: Cash and cash equivalents
+    image_regions:
+      2025: { x: 602, y: 125, width: 34, height: 16 }
+      2024: { x: 693, y: 125, width: 34, height: 16 }
+  marketable_securities:
+    label: Marketable securities
+    image_regions:
+      2025: { x: 619, y: 140, width: 16, height: 16 }
+      2024: { x: 705, y: 140, width: 21, height: 16 }
+  accounts_receivable:
+    label: Accounts receivable, net
+    note: Net of allowance for credit losses of $39 and $119 at December 31, 2025 and 2024, respectively.
+    image_regions:
+      2025: { x: 607, y: 165, width: 29, height: 16 }
+      2024: { x: 698, y: 165, width: 29, height: 16 }
+  inventory:
+    label: Inventory
+    image_regions:
+      2025: { x: 607, y: 180, width: 29, height: 16 }
+      2024: { x: 698, y: 180, width: 29, height: 16 }
+  prepaid_expenses_and_other_current_assets:
+    label: Prepaid expenses and other current assets
+    image_regions:
+      2025: { x: 607, y: 195, width: 29, height: 16 }
+      2024: { x: 705, y: 195, width: 21, height: 16 }
+  total_current_assets:
+    label: Total current assets
+    image_regions:
+      2025: { x: 602, y: 210, width: 34, height: 16 }
+      2024: { x: 693, y: 210, width: 34, height: 16 }
+  property_plant_and_equipment_net:
+    label: Property, plant, and equipment, net
+    note: Carries footnote (a), pointing to Note 18, Related Party Transactions.
+    image_regions:
+      2025: { x: 602, y: 225, width: 34, height: 16 }
+      2024: { x: 693, y: 225, width: 34, height: 16 }
+  finance_lease_right_of_use_assets:
+    label: Finance lease right-of-use assets
+    image_regions:
+      2025: { x: 607, y: 240, width: 29, height: 16 }
+      2024: { x: 698, y: 240, width: 29, height: 16 }
+  intangible_assets_net:
+    label: Intangible assets, net
+    image_regions:
+      2025: { x: 607, y: 255, width: 29, height: 16 }
+      2024: { x: 698, y: 255, width: 29, height: 16 }
+  digital_assets:
+    label: Digital assets
+    image_regions:
+      2025: { x: 607, y: 270, width: 29, height: 16 }
+      2024: { x: 698, y: 270, width: 29, height: 16 }
+  goodwill:
+    label: Goodwill
+    image_regions:
+      2025: { x: 602, y: 285, width: 34, height: 16 }
+      2024: { x: 693, y: 285, width: 34, height: 16 }
+  deferred_tax_assets:
+    label: Deferred tax assets
+    image_regions:
+      2025: { x: 614, y: 300, width: 21, height: 16 }
+      2024: { x: 705, y: 300, width: 21, height: 16 }
+  other_assets:
+    label: Other assets
+    image_regions:
+      2025: { x: 607, y: 315, width: 29, height: 16 }
+      2024: { x: 698, y: 315, width: 29, height: 16 }
+  total_assets:
+    label: Total assets
+    image_regions:
+      2025: { x: 602, y: 330, width: 34, height: 16 }
+      2024: { x: 693, y: 330, width: 34, height: 16 }
+  accounts_payable:
+    label: Accounts payable
+    image_regions:
+      2025: { x: 602, y: 379, width: 34, height: 16 }
+      2024: { x: 698, y: 379, width: 29, height: 16 }
+  deferred_revenue_current:
+    label: Deferred revenue, current
+    image_regions:
+      2025: { x: 607, y: 394, width: 28, height: 16 }
+      2024: { x: 698, y: 394, width: 29, height: 16 }
+  debt_and_finance_leases_current:
+    label: Debt and finance leases, current
+    note: Related party of $455 and $- at December 31, 2025 and 2024, respectively.
+    image_regions:
+      2025: { x: 614, y: 419, width: 21, height: 16 }
+      2024: { x: 705, y: 419, width: 21, height: 16 }
+  accrued_expenses_and_other_current_liabilities:
+    label: Accrued expenses and other current liabilities
+    image_regions:
+      2025: { x: 607, y: 434, width: 29, height: 16 }
+      2024: { x: 698, y: 434, width: 29, height: 16 }
+  total_current_liabilities:
+    label: Total current liabilities
+    image_regions:
+      2025: { x: 602, y: 449, width: 34, height: 16 }
+      2024: { x: 693, y: 449, width: 34, height: 16 }
+  deferred_revenue_noncurrent:
+    label: Deferred revenue, net of current
+    image_regions:
+      2025: { x: 607, y: 479, width: 29, height: 16 }
+      2024: { x: 698, y: 479, width: 29, height: 16 }
+  debt_and_finance_leases_noncurrent:
+    label: Debt and finance leases, net of current
+    note: Related party of $4,052 and $- at December 31, 2025 and 2024, respectively.
+    image_regions:
+      2025: { x: 602, y: 504, width: 34, height: 16 }
+      2024: { x: 693, y: 504, width: 34, height: 16 }
+  other_liabilities:
+    label: Other liabilities
+    image_regions:
+      2025: { x: 607, y: 519, width: 29, height: 16 }
+      2024: { x: 698, y: 519, width: 29, height: 16 }
+  total_liabilities:
+    label: Total liabilities
+    image_regions:
+      2025: { x: 602, y: 534, width: 34, height: 16 }
+      2024: { x: 693, y: 534, width: 34, height: 16 }
+  redeemable_convertible_preferred_stock:
+    label: Redeemable convertible preferred stock
+    note: >
+      Par value $0.001; 2,351 and 1,997 shares issued; 2,046 and 1,748 shares outstanding as of December 31, 2025 and
+      2024, respectively. Sits between liabilities and equity, outside total shareholders' equity.
+    image_regions:
+      2025: { x: 602, y: 589, width: 34, height: 16 }
+      2024: { x: 693, y: 589, width: 34, height: 16 }
+  class_a_common_stock:
+    label: Class A common stock
+    note: >
+      Par value $0.001; 2,036 and 1,832 shares issued; 1,954 and 1,832 shares outstanding as of December 31, 2025 and
+      2024, respectively.
+    image_regions:
+      2025: { x: 624, y: 629, width: 11, height: 16 }
+      2024: { x: 715, y: 629, width: 11, height: 16 }
+  class_b_common_stock:
+    label: Class B common stock
+    note: >
+      Par value $0.001; 644 and 768 shares issued and outstanding as of December 31, 2025 and 2024, respectively.
+    image_regions:
+      2025: { x: 624, y: 654, width: 11, height: 16 }
+      2024: { x: 715, y: 654, width: 11, height: 16 }
+  class_c_common_stock:
+    label: Class C common stock
+    note: >
+      Par value $0.001; 482 and 421 shares issued and outstanding as of December 31, 2025 and 2024, respectively.
+      Printed as 0 rather than a dash: par value rounds to less than a million.
+    image_regions:
+      2025: { x: 624, y: 679, width: 11, height: 16 }
+      2024: { x: 715, y: 679, width: 11, height: 16 }
+  class_d_common_stock:
+    label: Class D common stock
+    missing: zero
+    note: Par value $0.0001; no shares issued and outstanding as of December 31, 2025 and 2024.
+    image_regions:
+      2025: { x: 619, y: 704, width: 16, height: 16 }
+      2024: { x: 710, y: 704, width: 16, height: 16 }
+  additional_paid_in_capital:
+    label: Additional paid-in capital
+    image_regions:
+      2025: { x: 602, y: 719, width: 34, height: 16 }
+      2024: { x: 693, y: 719, width: 34, height: 16 }
+  accumulated_deficit:
+    label: Accumulated deficit
+    printed: negated
+    sign: contra
+    image_regions:
+      2025: { x: 598, y: 734, width: 41, height: 16 }
+      2024: { x: 689, y: 734, width: 41, height: 16 }
+  accumulated_other_comprehensive_income:
+    label: Accumulated other comprehensive income
+    image_regions:
+      2025: { x: 607, y: 749, width: 29, height: 16 }
+      2024: { x: 698, y: 749, width: 29, height: 16 }
+  total_shareholders_equity:
+    label: Total shareholders' equity
+    image_regions:
+      2025: { x: 607, y: 768, width: 29, height: 16 }
+      2024: { x: 698, y: 768, width: 29, height: 16 }
+  total_liabilities_preferred_and_equity:
+    label: Total liabilities, redeemable convertible preferred stock, and shareholders' equity
+    image_regions:
+      2025: { x: 602, y: 787, width: 34, height: 16 }
+      2024: { x: 693, y: 787, width: 34, height: 16 }

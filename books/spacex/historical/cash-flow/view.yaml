@@ -1,0 +1,166 @@
+title: Cash Flow Statement
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025]
+
+rows:
+  - label: Operating activities
+    style: header
+  - line: net_income
+
+  - space: compact
+
+  - line: depreciation_and_amortization
+    indent: 1
+  - line: share_based_compensation
+    indent: 1
+  - line: intangible_asset_impairment
+    indent: 1
+  - line: deferred_income_taxes
+    indent: 1
+  - line: unrealized_gain_loss_on_digital_assets
+    indent: 1
+  - line: impairment_and_loss_on_disposal_of_fixed_assets
+    indent: 1
+  - line: amortization_of_debt_discount_and_issuance_costs
+    indent: 1
+  - line: other_operating_adjustments
+    label: Other adjustments
+    indent: 1
+
+  - space: compact
+
+  - label: Changes in operating assets and liabilities
+    style: header
+  - line: change_in_accounts_receivable
+    indent: 1
+  - line: change_in_inventory
+    indent: 1
+  - line: change_in_prepaid_expenses_and_other_assets
+    indent: 1
+  - line: change_in_accounts_payable
+    indent: 1
+  - line: change_in_deferred_revenue
+    indent: 1
+  - line: change_in_operating_lease_liabilities_net
+    indent: 1
+  - line: change_in_other_liabilities
+    indent: 1
+
+  - space: compact
+
+  - line: net_cash_from_operating_activities
+    style: subtotal
+  - line: operating_cash_flow_growth
+    label: Operating cash flow growth
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Investing activities
+    style: header
+  - line: purchases_of_property_plant_and_equipment
+    indent: 1
+  - line: capitalized_interest
+    indent: 1
+  - line: proceeds_from_product_rebates
+    indent: 1
+  - line: purchases_of_marketable_securities
+    indent: 1
+  - line: maturities_of_marketable_securities
+    indent: 1
+  - line: proceeds_from_sales_of_marketable_securities
+    indent: 1
+  - line: investments_in_unconsolidated_affiliates
+    indent: 1
+  - line: other_investing_activities_net
+    indent: 1
+  - line: net_cash_from_investing_activities
+    style: subtotal
+
+  - space: compact
+
+  - line: capital_expenditures
+    label: Capital expenditures
+    style: supplemental
+    indent: 1
+  - line: free_cash_flow
+    label: Free cash flow
+    style: supplemental
+    indent: 1
+  - line: capex_coverage
+    label: Operating cash flow per dollar of capex
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: Financing activities
+    style: header
+  - line: principal_repayments_on_finance_leases
+    indent: 1
+  - line: proceeds_from_debt_and_other_financing_obligations
+    indent: 1
+  - line: payment_of_debt_issuance_costs
+    indent: 1
+  - line: repayments_on_debt_and_other_financing_obligations
+    indent: 1
+  - line: proceeds_from_issuance_of_capital_stock
+    label: Proceeds from issuance of capital stock
+    indent: 1
+  - line: proceeds_from_employee_equity_award_plans
+    indent: 1
+  - line: payments_for_repurchase_of_stock
+    label: Repurchases of common and preferred stock
+    indent: 1
+  - line: taxes_paid_for_net_share_settlement
+    indent: 1
+  - line: net_cash_from_financing_activities
+    style: subtotal
+
+  - space: compact
+
+  - line: net_cash_from_debt
+    label: Net cash raised from debt
+    indent: 1
+  - line: net_cash_from_equity
+    label: Net cash raised from equity
+    indent: 1
+  - line: external_funding_of_the_shortfall
+    label: Shortfall left for financing to cover
+    indent: 1
+
+  - space: compact
+
+  - line: effect_of_exchange_rate_changes_on_cash
+    label: Effect of exchange rate changes
+    indent: 1
+  - line: net_change_in_cash
+    style: subtotal
+  - line: cash_and_restricted_cash_beginning_of_year
+    label: Cash and restricted cash, beginning of year
+    indent: 1
+  - line: cash_and_restricted_cash_end_of_year
+    label: Cash and restricted cash, end of year
+    style: total
+
+  - space: compact
+
+  - label: Supplemental disclosures
+    style: header
+  - line: cash_paid_for_interest_net_of_capitalized
+    label: Cash paid for interest, net of interest capitalized
+    indent: 1
+  - line: cash_paid_for_income_taxes_net
+    label: Cash paid for income taxes, net
+    indent: 1
+  - line: share_based_compensation_capitalized_in_property_plant_and_equipment
+    label: Share-based compensation capitalized into fixed assets
+    indent: 1
+  - line: total_share_based_compensation
+    label: Total share-based compensation
+    indent: 1
+  - line: property_plant_and_equipment_in_accounts_payable
+    label: Fixed asset purchases still sitting in accounts payable
+    indent: 1

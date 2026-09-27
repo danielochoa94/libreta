@@ -1,0 +1,38 @@
+table:
+  title: Reconciliation of income (loss) from operations to Segment Adjusted EBITDA
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026040364/spaceexplorationtechnologib.htm#id286866c4c474ba490d6531a57db9e93_1538
+  image: segment-adjusted-ebitda-2023.png
+  details:
+    Table: Reconciliation of income (loss) from operations to Segment Adjusted EBITDA, year ended December 31, 2023
+    Page: "121"
+    Document: SpaceX 2026 S-1/A
+    Extracted: 2026-08-08
+  note: >
+    Non-GAAP, defined by the company in Management's Discussion and Analysis rather than by the
+    accounting standards. Only the reconciliation's result is stored: its add-back rows repeat
+    depreciation and amortization, share-based compensation, restructuring, and impairment from
+    Note 19, and checks.yaml rebuilds this figure from those. The filing also reconciles the three
+    months ended March 31 of 2025 and 2026, which are interim and not part of this table.
+
+defaults:
+  printed: as_is
+
+line_items:
+  space_adjusted_ebitda:
+    label: Space Segment Adjusted EBITDA
+    image_regions:
+      2023: { x: 416, y: 183, width: 26, height: 19 }
+  connectivity_adjusted_ebitda:
+    label: Connectivity Segment Adjusted EBITDA
+    image_regions:
+      2023: { x: 497, y: 183, width: 36, height: 19 }
+  ai_adjusted_ebitda:
+    label: AI Segment Adjusted EBITDA
+    image_regions:
+      2023: { x: 588, y: 183, width: 36, height: 19 }
+  total_adjusted_ebitda:
+    label: Total reportable segments Segment Adjusted EBITDA
+    image_regions:
+      2023: { x: 679, y: 183, width: 36, height: 19 }

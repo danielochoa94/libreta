@@ -1,0 +1,71 @@
+title: Profitability
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025, H1 2025, H1 2026, ltm]
+
+rows:
+  - label: Operating income (loss)
+    style: header
+  - line: space_operating_income
+    label: Space
+    indent: 1
+  - line: connectivity_operating_income
+    label: Connectivity
+    indent: 1
+  - line: ai_operating_income
+    label: AI
+    indent: 1
+  - line: total_operating_income
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Operating margin
+    style: header
+  - line: space_operating_margin
+    label: Space
+    indent: 1
+  - line: connectivity_operating_margin
+    label: Connectivity
+    indent: 1
+  - line: ai_operating_margin
+    label: AI
+    indent: 1
+  - line: total_operating_margin
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Segment Adjusted EBITDA
+    style: header
+  - line: space_adjusted_ebitda
+    label: Space
+    indent: 1
+  - line: connectivity_adjusted_ebitda
+    label: Connectivity
+    indent: 1
+  - line: ai_adjusted_ebitda
+    label: AI
+    indent: 1
+  - line: total_adjusted_ebitda
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Adjusted EBITDA margin
+    style: header
+  - line: space_adjusted_ebitda_margin
+    label: Space
+    indent: 1
+  - line: connectivity_adjusted_ebitda_margin
+    label: Connectivity
+    indent: 1
+  - line: ai_adjusted_ebitda_margin
+    label: AI
+    indent: 1
+  - line: total_adjusted_ebitda_margin
+    label: Total reportable segments
+    style: subtotal

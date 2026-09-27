@@ -1,0 +1,116 @@
+table:
+  title: Consolidated Statements of Operations
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/spcx-20260630.htm#ib0e99459acb642ca82e016ed95816e66_256
+  image: consolidated-statements-of-operations.png
+  details:
+    Table: Consolidated Statements of Operations
+    Page: "5"
+    Document: SpaceX Form 10-Q for the quarter ended June 30, 2026
+    Extracted: 2026-09-23
+  note: The six-month columns only; the three-month columns are not extracted. Unaudited.
+
+defaults:
+  printed: as_is
+
+line_items:
+  revenue:
+    label: Revenue
+    image_regions:
+      H1 2026: { x: 675, y: 198, width: 36, height: 17 }
+      H1 2025: { x: 776, y: 198, width: 30, height: 17 }
+  cost_of_revenue:
+    label: Cost of revenue
+    sign: contra
+    image_regions:
+      H1 2026: { x: 680, y: 227, width: 30, height: 17 }
+      H1 2025: { x: 776, y: 227, width: 30, height: 17 }
+  research_and_development:
+    label: Research and development
+    sign: contra
+    image_regions:
+      H1 2026: { x: 680, y: 242, width: 30, height: 17 }
+      H1 2025: { x: 776, y: 242, width: 30, height: 17 }
+  selling_general_and_administrative:
+    label: Selling, general, and administrative
+    sign: contra
+    image_regions:
+      H1 2026: { x: 680, y: 257, width: 30, height: 17 }
+      H1 2025: { x: 776, y: 257, width: 30, height: 17 }
+  restructuring_charges:
+    label: Restructuring charges (credits)
+    sign: contra
+    image_regions:
+      H1 2026: { x: 694, y: 271, width: 19, height: 17 }
+      H1 2025: { x: 784, y: 271, width: 22, height: 17 }
+  impairment:
+    label: Impairment
+    sign: contra
+    image_regions:
+      H1 2026: { x: 693, y: 286, width: 17, height: 17 }
+      H1 2025: { x: 789, y: 286, width: 17, height: 17 }
+  total_costs_and_expenses:
+    label: Total costs and expenses
+    sign: contra
+    image_regions:
+      H1 2026: { x: 675, y: 302, width: 36, height: 17 }
+      H1 2025: { x: 776, y: 302, width: 30, height: 17 }
+  operating_income:
+    label: Loss from operations
+    image_regions:
+      H1 2026: { x: 676, y: 317, width: 38, height: 17 }
+      H1 2025: { x: 779, y: 317, width: 30, height: 17 }
+  interest_expense:
+    label: Interest expense
+    printed: negated
+    sign: contra
+    note: Related party of $513 and $- for the six months ended June 30, 2026 and 2025, respectively.
+    image_regions:
+      H1 2026: { x: 676, y: 354, width: 38, height: 17 }
+      H1 2025: { x: 779, y: 354, width: 30, height: 17 }
+  interest_income:
+    label: Interest income
+    image_regions:
+      H1 2026: { x: 688, y: 369, width: 22, height: 17 }
+      H1 2025: { x: 784, y: 369, width: 22, height: 17 }
+  other_income_expense_net:
+    label: Other income (expense), net
+    image_regions:
+      H1 2026: { x: 676, y: 383, width: 38, height: 17 }
+      H1 2025: { x: 784, y: 383, width: 22, height: 17 }
+  pretax_income:
+    label: Loss before income taxes
+    image_regions:
+      H1 2026: { x: 676, y: 399, width: 38, height: 17 }
+      H1 2025: { x: 771, y: 399, width: 38, height: 17 }
+  income_tax_expense:
+    label: Provision for income taxes
+    sign: contra
+    image_regions:
+      H1 2026: { x: 693, y: 414, width: 17, height: 17 }
+      H1 2025: { x: 784, y: 414, width: 22, height: 17 }
+  net_income:
+    label: Net loss
+    image_regions:
+      H1 2026: { x: 676, y: 429, width: 38, height: 17 }
+      H1 2025: { x: 771, y: 429, width: 38, height: 17 }
+  net_income_attributable_to_shareholders_basic:
+    label: Net loss attributable to shareholders - basic and diluted
+    image_regions:
+      H1 2026: { x: 676, y: 448, width: 38, height: 17 }
+      H1 2025: { x: 771, y: 448, width: 38, height: 17 }
+  earnings_per_share_basic:
+    label: Basic and Diluted
+    units: dollars_per_share
+    note: Net loss per share of common stock attributable to common shareholders.
+    image_regions:
+      H1 2026: { x: 681, y: 492, width: 32, height: 17 }
+      H1 2025: { x: 777, y: 492, width: 32, height: 17 }
+  weighted_average_shares_basic:
+    label: Basic and Diluted
+    units: millions_of_shares
+    note: Weighted average shares used in computing net loss per share of common stock.
+    image_regions:
+      H1 2026: { x: 680, y: 521, width: 30, height: 17 }
+      H1 2025: { x: 776, y: 521, width: 30, height: 17 }

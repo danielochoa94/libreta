@@ -1,0 +1,16 @@
+checks:
+  net_cash_from_operating_activities:
+    formula: net_income + depreciation_and_amortization + share_based_compensation + intangible_asset_impairment + deferred_income_taxes + unrealized_gain_loss_on_digital_assets + impairment_and_loss_on_disposal_of_fixed_assets + amortization_of_debt_discount_and_issuance_costs + other_operating_adjustments + change_in_accounts_receivable + change_in_inventory + change_in_prepaid_expenses_and_other_assets + change_in_accounts_payable + change_in_deferred_revenue + change_in_operating_lease_liabilities_net + change_in_other_liabilities - net_cash_from_operating_activities
+  net_cash_from_investing_activities:
+    formula: purchases_of_property_plant_and_equipment + capitalized_interest + proceeds_from_product_rebates + purchases_of_marketable_securities + maturities_of_marketable_securities + proceeds_from_sales_of_marketable_securities + investments_in_unconsolidated_affiliates + other_investing_activities_net - net_cash_from_investing_activities
+  net_cash_from_financing_activities:
+    formula: principal_repayments_on_finance_leases + proceeds_from_debt_and_other_financing_obligations + payment_of_debt_issuance_costs + repayments_on_debt_and_other_financing_obligations + proceeds_from_issuance_of_capital_stock + proceeds_from_employee_equity_award_plans + payments_for_repurchase_of_stock + taxes_paid_for_net_share_settlement - net_cash_from_financing_activities
+  net_change_in_cash:
+    formula: net_cash_from_operating_activities + net_cash_from_investing_activities + net_cash_from_financing_activities + effect_of_exchange_rate_changes_on_cash - net_change_in_cash
+
+  cash_and_restricted_cash_end_of_year:
+    formula: cash_and_restricted_cash_beginning_of_year + net_change_in_cash - cash_and_restricted_cash_end_of_year
+
+  opening_cash_continues_prior_year:
+    formula: cash_and_restricted_cash_beginning_of_year - prior(cash_and_restricted_cash_end_of_year)
+    note: One year's closing cash is the next year's opening cash.

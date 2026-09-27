@@ -1,0 +1,34 @@
+table:
+  title: Company forecast drivers
+
+defaults:
+  units: percent
+
+line_items:
+  share_based_compensation_first_year:
+    label: Share-based compensation as % of revenue, 2026
+    note: >
+      12% of revenue in the first half of 2026. Treated as a cost, because the share count in the equity bridge does
+      not grow with future awards.
+  share_based_compensation_long_run:
+    label: Share-based compensation as % of revenue, long run
+  share_based_compensation_fade:
+    label: Share-based compensation fade
+  depreciation_rate:
+    label: Depreciation as % of property, plant, and equipment
+    note: >
+      Applied to opening net property, plant, and equipment plus half the year's capital expenditures, about a
+      five-year life. 2025 depreciation and amortization was 21% on the same basis.
+  working_capital_as_percent_of_incremental_revenue:
+    label: Working capital as % of incremental revenue
+    note: >
+      Negative, because customers prepay: working capital released 45% of incremental revenue in 2024 and 2025, mostly
+      through deferred revenue. This forecast assumes under a quarter of that.
+  tax_rate:
+    label: Tax rate
+    note: >
+      The 21% federal statutory rate. State taxes are left out, and so are the $3,586 of federal tax credits that
+      would offset them.
+  net_operating_loss_utilization_limit:
+    label: Net operating loss utilization limit
+    note: Losses arising after 2017 can offset at most 80% of a year's taxable income (26 U.S.C. § 172(a)(2)).

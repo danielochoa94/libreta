@@ -1,0 +1,37 @@
+title: Terminal Value
+subtitle: in millions of USD
+
+columns: [Value]
+
+rows:
+  - line: terminal_year_ebit
+  - line: perpetual_growth_rate
+    indent: 1
+  - line: dcf.assumptions.tax_rate
+    label: Tax rate
+    indent: 1
+  - line: terminal_nopat
+    style: subtotal
+  - line: return_on_new_invested_capital
+    indent: 1
+  - line: reinvestment_rate
+    indent: 1
+  - line: terminal_free_cash_flow
+    style: subtotal
+
+  - space: compact
+
+  - line: dcf.wacc.wacc
+    label: WACC
+    indent: 1
+  - line: perpetual_growth_rate
+    indent: 1
+  - line: terminal_value
+    style: subtotal
+  - line: implied_exit_multiple
+    style: supplemental
+    indent: 1
+  - line: terminal_value_discount_factor
+    indent: 1
+  - line: present_value_of_terminal_value
+    style: total

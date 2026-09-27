@@ -1,0 +1,34 @@
+formulas:
+  terminal_year_ebit:
+    label: EBIT, 2035
+    formula: dcf.discounted_cash_flow.ebit["2035E"]
+  terminal_nopat:
+    label: NOPAT, 2036
+    formula: terminal_year_ebit * (1 + perpetual_growth_rate) * (1 - dcf.assumptions.tax_rate["Value"])
+    note: Fully taxed; the forecast has used up the loss carryforwards by 2035.
+  reinvestment_rate:
+    formula: perpetual_growth_rate / return_on_new_invested_capital
+    units: percent
+    note: The share of NOPAT that must be reinvested to grow at the perpetual rate when new capital earns its return.
+  terminal_free_cash_flow:
+    label: Free cash flow, 2036
+    formula: terminal_nopat * (1 - reinvestment_rate)
+  terminal_value:
+    formula: terminal_free_cash_flow / (dcf.wacc.wacc["Value"] - perpetual_growth_rate)
+    note: >
+      Growing perpetuity on NOPAT net of the reinvestment its growth requires, rather than on 2035 cash flow, whose
+      capital spending still funds faster growth than the perpetual rate.
+  terminal_value_discount_factor:
+    label: Discount factor
+    formula: dcf.discounted_cash_flow.discount_factor["2035E"]
+    units: ratio
+    note: >
+      2035's mid-year factor, the same as valuing the perpetuity's mid-year cash flows at the end of 2035 and
+      discounting that from December 31.
+  present_value_of_terminal_value:
+    formula: terminal_value * terminal_value_discount_factor
+
+  implied_exit_multiple:
+    label: Terminal value / 2035 Adjusted EBITDA
+    formula: terminal_value / dcf.discounted_cash_flow.adjusted_ebitda["2035E"]
+    units: times

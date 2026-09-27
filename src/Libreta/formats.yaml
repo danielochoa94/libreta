@@ -1,0 +1,24 @@
+defaults:
+  dash: "-"
+  zero: "-"
+  unresolved: ""
+
+formats:
+  percent:
+    scale: 100
+    decimals: 1
+    suffix: "%"
+
+  times:
+    decimals: 2
+    suffix: "x"
+
+  ratio:
+    decimals: 2
+
+  dollars:
+    prefix: "$"
+    decimals: 2
+
+  date:
+    date: MMM d, yyyy

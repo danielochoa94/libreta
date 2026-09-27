@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Libreta</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <div id="error" hidden></div>
+  <div class="layout inspector-hidden">
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-controls="book-navigation" aria-expanded="true"
+            aria-label="Hide navigation" title="Hide navigation">
+      <svg class="icon" viewBox="0 0 20 20" aria-hidden="true">
+        <rect x="2.5" y="3" width="15" height="14" rx="1.5"></rect>
+        <path d="M7.5 3v14"></path>
+      </svg>
+    </button>
+    <nav class="navigation" id="book-navigation" aria-label="Book views">
+      <div class="eyebrow" id="book-short-name"></div>
+      <div id="view-tree"></div>
+      <footer class="credit"><a href="https://editide.com" target="_blank" rel="noopener">Libreta by editide</a></footer>
+      <div class="scale-control">
+        <button type="button" id="scale-reset" title="Reset text size">Aa</button>
+        <input type="range" id="scale" min="70" max="140" step="5" value="100" aria-label="Text size">
+        <span id="scale-value">100%</span>
+        <button type="button" class="icon-button theme-toggle" id="theme-toggle">
+          <svg class="icon theme-light" viewBox="0 0 20 20" aria-hidden="true">
+            <circle cx="10" cy="10" r="3.5"></circle>
+            <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.3 4.3l1.4 1.4M14.3 14.3l1.4 1.4M4.3 15.7l1.4-1.4M14.3 5.7l1.4-1.4"></path>
+          </svg>
+          <svg class="icon theme-dark" viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M16 12.5A6.5 6.5 0 0 1 7.5 4a6.5 6.5 0 1 0 8.5 8.5z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="resizer nav-resizer" id="nav-resizer" role="separator" aria-orientation="vertical"
+           aria-label="Navigation width" tabindex="0" title="Drag to resize, double-click to reset"></div>
+    </nav>
+    <main>
+      <header>
+        <div class="title-row">
+          <div>
+            <h1 id="title"></h1>
+            <p class="subtitle" id="subtitle"></p>
+          </div>
+        </div>
+      </header>
+      <div class="table-viewport" tabindex="-1">
+        <div class="table-card">
+          <div class="table-shell">
+            <table class="book-table" role="grid" aria-labelledby="title" aria-multiselectable="true">
+              <thead><tr id="head"></tr></thead>
+              <tbody id="body"></tbody>
+            </table>
+            <div class="resizer label-resizer" id="label-resizer" role="separator" aria-orientation="vertical"
+                 aria-label="Line item column width" tabindex="0" title="Drag to resize, double-click to reset"></div>
+          </div>
+        </div>
+        <div id="sensitivities"></div>
+        <section id="checks"></section>
+      </div>
+    </main>
+    <aside class="inspector" hidden>
+      <div class="resizer inspector-resizer" id="inspector-resizer" role="separator" aria-orientation="vertical"
+           aria-label="Inspector width" tabindex="0" title="Drag to resize, double-click to reset"></div>
+      <div class="inspector-content" id="panel" tabindex="-1"></div>
+      <div class="inspector-toolbar" role="group" aria-label="Inspector position">
+        <button type="button" class="dock-button" id="dock-right" aria-label="Dock inspector right" title="Dock inspector right">
+          <svg class="icon" viewBox="0 0 20 20" aria-hidden="true">
+            <rect x="2.5" y="3" width="15" height="14" rx="1.5"></rect>
+            <path d="M12.5 3v14"></path>
+          </svg>
+        </button>
+        <button type="button" class="dock-button" id="dock-bottom" aria-label="Dock inspector bottom" title="Dock inspector bottom">
+          <svg class="icon" viewBox="0 0 20 20" aria-hidden="true">
+            <rect x="2.5" y="3" width="15" height="14" rx="1.5"></rect>
+            <path d="M2.5 11.5h15"></path>
+          </svg>
+        </button>
+      </div>
+    </aside>
+  </div>
+  <div class="status">
+    <span class="status-indicator" id="dot"></span>
+    <span id="status">Connecting</span>
+    <button type="button" id="shortcuts-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+  </div>
+  <dialog class="shortcuts-dialog" id="shortcuts-dialog" aria-labelledby="shortcuts-title">
+    <div class="shortcuts-heading">
+      <h2 id="shortcuts-title">Keyboard shortcuts</h2>
+      <button type="button" id="shortcuts-close" aria-label="Close keyboard shortcuts">×</button>
+    </div>
+    <dl>
+      <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Move between row overview and periods</dd>
+      <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Move between line items</dd>
+      <dt><kbd>Shift</kbd> + <kbd>Arrow</kbd></dt><dd>Extend the selected cell range</dd>
+      <dt><kbd>Ctrl</kbd> + <kbd>C</kbd></dt><dd>Copy selected cells as displayed</dd>
+      <dt><kbd>Ctrl</kbd> + drag</dt><dd>Add another region to the selection</dd>
+      <dt><kbd>Ctrl</kbd> + <kbd>←</kbd> <kbd>→</kbd></dt><dd>Jump to the first or last cell in the row</dd>
+      <dt><kbd>Ctrl</kbd> + <kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Jump to the edge of the current section</dd>
+      <dt><kbd>Home</kbd> <kbd>End</kbd></dt><dd>First or last cell in the row</dd>
+      <dt><kbd>Ctrl</kbd> + <kbd>Home</kbd> <kbd>End</kbd></dt><dd>First or last cell in the table</dd>
+      <dt><kbd>PgUp</kbd> <kbd>PgDn</kbd></dt><dd>Move a screen up or down, with <kbd>Shift</kbd> to extend the range</dd>
+      <dt><kbd>↑</kbd> <kbd>↓</kbd> in navigation</dt><dd>Select the previous or next view</dd>
+      <dt><kbd>←</kbd> <kbd>→</kbd> in navigation</dt><dd>Collapse or expand a view</dd>
+      <dt><kbd>Enter</kbd> in navigation</dt><dd>Move into the table</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Return to the table or clear selection</dd>
+      <dt><kbd>g</kbd> <kbd>n</kbd></dt><dd>Go to navigation</dd>
+      <dt><kbd>g</kbd> <kbd>t</kbd></dt><dd>Go to table</dd>
+      <dt><kbd>g</kbd> <kbd>c</kbd></dt><dd>Toggle calculation colors</dd>
+      <dt><kbd>g</kbd> <kbd>l</kbd></dt><dd>Toggle readable names in formulas</dd>
+      <dt><kbd>[</kbd> <kbd>]</kbd></dt><dd>Previous or next view</dd>
+      <dt><kbd>\</kbd></dt><dd>Show or hide the navigation</dd>
+      <dt><kbd>?</kbd></dt><dd>Show this reference</dd>
+    </dl>
+  </dialog>
+  <dialog class="source-image-dialog" id="source-image-dialog" aria-labelledby="source-image-title">
+    <div class="source-image-dialog-frame">
+      <div class="source-image-dialog-heading">
+        <h2 id="source-image-title">Source image</h2>
+        <div class="source-image-dialog-actions">
+          <div class="source-image-zoom-controls" role="group" aria-label="Image zoom">
+            <button type="button" id="source-image-zoom-out" aria-label="Zoom out">−</button>
+            <output id="source-image-zoom-value" aria-live="polite">100%</output>
+            <button type="button" id="source-image-zoom-in" aria-label="Zoom in">+</button>
+            <button type="button" id="source-image-zoom-fit">Fit</button>
+          </div>
+          <button type="button" id="source-image-close" aria-label="Close source image">×</button>
+        </div>
+      </div>
+      <div class="source-image-dialog-viewport" tabindex="0" aria-label="Zoomable source image">
+        <div class="source-image-dialog-canvas">
+          <img id="source-image-full" alt="">
+          <svg class="source-image-highlight" id="source-image-full-highlight" aria-hidden="true" hidden>
+            <rect></rect>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>

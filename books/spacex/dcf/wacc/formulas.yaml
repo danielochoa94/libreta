@@ -1,0 +1,54 @@
+formulas:
+  space_weight:
+    label: Space
+    formula: dcf.discounted_cash_flow.segments.space_adjusted_ebitda["2035E"] / dcf.discounted_cash_flow.segments.total_adjusted_ebitda["2035E"]
+    units: percent
+    note: >
+      Each segment's share of 2035 Segment Adjusted EBITDA, a proxy for its share of value that avoids weighting by
+      the valuation being solved for.
+  connectivity_weight:
+    label: Connectivity
+    formula: dcf.discounted_cash_flow.segments.connectivity_adjusted_ebitda["2035E"] / dcf.discounted_cash_flow.segments.total_adjusted_ebitda["2035E"]
+    units: percent
+  ai_weight:
+    label: AI
+    formula: dcf.discounted_cash_flow.segments.ai_adjusted_ebitda["2035E"] / dcf.discounted_cash_flow.segments.total_adjusted_ebitda["2035E"]
+    units: percent
+  unlevered_beta:
+    formula: space_weight * space_unlevered_beta + connectivity_weight * connectivity_unlevered_beta + ai_weight * ai_unlevered_beta
+    units: ratio
+
+  market_value_of_equity:
+    formula: dcf.market_capitalization["Value"]
+  debt_and_finance_leases:
+    formula: historical.balance_sheet.total_debt["Jun 2026"]
+    note: Book value stands in for market value; most of it is notes issued at the end of June.
+  debt_to_equity:
+    label: Debt to equity
+    formula: debt_and_finance_leases / market_value_of_equity
+    units: percent
+  tax_rate:
+    formula: dcf.assumptions.tax_rate["Value"]
+    units: percent
+  levered_beta:
+    formula: unlevered_beta * (1 + (1 - tax_rate) * debt_to_equity)
+    units: ratio
+
+  cost_of_equity:
+    formula: risk_free_rate + levered_beta * equity_risk_premium
+    units: percent
+  after_tax_cost_of_debt:
+    label: After-tax cost of debt
+    formula: pre_tax_cost_of_debt * (1 - tax_rate)
+    units: percent
+  equity_weight:
+    formula: market_value_of_equity / (market_value_of_equity + debt_and_finance_leases)
+    units: percent
+  debt_weight:
+    formula: debt_and_finance_leases / (market_value_of_equity + debt_and_finance_leases)
+    units: percent
+  wacc:
+    label: WACC
+    formula: equity_weight * cost_of_equity + debt_weight * after_tax_cost_of_debt
+    units: percent
+    note: Damodaran's post-prospectus valuation of SpaceX used 8.37%, with a 4.56% Treasury yield.

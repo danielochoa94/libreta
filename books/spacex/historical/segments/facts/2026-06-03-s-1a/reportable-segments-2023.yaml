@@ -1,0 +1,200 @@
+table:
+  title: Note 19, Segments
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026040364/spaceexplorationtechnologib.htm#id286866c4c474ba490d6531a57db9e93_1833
+  image: reportable-segments-2023.png
+  details:
+    Table: Note 19, Segments, year ended December 31, 2023
+    Page: F-58
+    Document: SpaceX 2026 S-1/A
+    Extracted: 2026-08-08
+  note: >
+    The filing prints one table per year with the segments as columns; this table reads its year down a row at a time,
+    so a name carries its segment. The supplemental block's impairment row repeats the cost line and is not stored
+    twice, and its interest, other income and pretax rows are consolidated-only and live on the income statement.
+
+defaults:
+  printed: as_is
+
+line_items:
+  space_revenue:
+    label: Space revenue
+    image_regions:
+      2023: { x: 406, y: 71, width: 36, height: 19 }
+  connectivity_revenue:
+    label: Connectivity revenue
+    image_regions:
+      2023: { x: 497, y: 71, width: 36, height: 19 }
+  ai_revenue:
+    label: AI revenue
+    image_regions:
+      2023: { x: 588, y: 71, width: 36, height: 19 }
+  total_revenue:
+    label: Total reportable segments revenue
+    image_regions:
+      2023: { x: 672, y: 71, width: 43, height: 19 }
+  space_cost_of_revenue:
+    label: Space cost of revenue
+    image_regions:
+      2023: { x: 406, y: 109, width: 36, height: 19 }
+  connectivity_cost_of_revenue:
+    label: Connectivity cost of revenue
+    image_regions:
+      2023: { x: 497, y: 109, width: 36, height: 19 }
+  ai_cost_of_revenue:
+    label: AI cost of revenue
+    image_regions:
+      2023: { x: 588, y: 109, width: 36, height: 19 }
+  total_cost_of_revenue:
+    label: Total reportable segments cost of revenue
+    image_regions:
+      2023: { x: 679, y: 109, width: 36, height: 19 }
+  space_research_and_development:
+    label: Space research and development
+    image_regions:
+      2023: { x: 406, y: 128, width: 36, height: 19 }
+  connectivity_research_and_development:
+    label: Connectivity research and development
+    image_regions:
+      2023: { x: 507, y: 128, width: 26, height: 19 }
+  ai_research_and_development:
+    label: AI research and development
+    image_regions:
+      2023: { x: 598, y: 128, width: 26, height: 19 }
+  total_research_and_development:
+    label: Total reportable segments research and development
+    image_regions:
+      2023: { x: 679, y: 128, width: 36, height: 19 }
+  space_selling_general_and_administrative:
+    label: Space selling, general, and administrative
+    image_regions:
+      2023: { x: 416, y: 147, width: 26, height: 19 }
+  connectivity_selling_general_and_administrative:
+    label: Connectivity selling, general, and administrative
+    image_regions:
+      2023: { x: 507, y: 147, width: 26, height: 19 }
+  ai_selling_general_and_administrative:
+    label: AI selling, general, and administrative
+    image_regions:
+      2023: { x: 588, y: 147, width: 36, height: 19 }
+  total_selling_general_and_administrative:
+    label: Total reportable segments selling, general, and administrative
+    image_regions:
+      2023: { x: 679, y: 147, width: 36, height: 19 }
+  space_restructuring_charges:
+    label: Space restructuring charges
+    image_regions:
+      2023: { x: 423, y: 166, width: 20, height: 19 }
+  connectivity_restructuring_charges:
+    label: Connectivity restructuring charges
+    image_regions:
+      2023: { x: 514, y: 166, width: 20, height: 19 }
+  ai_restructuring_charges:
+    label: AI restructuring charges
+    image_regions:
+      2023: { x: 598, y: 166, width: 26, height: 19 }
+  total_restructuring_charges:
+    label: Total reportable segments restructuring charges
+    image_regions:
+      2023: { x: 689, y: 166, width: 26, height: 19 }
+  space_impairment:
+    missing: zero
+    label: Space impairment
+    image_regions:
+      2023: { x: 423, y: 185, width: 20, height: 19 }
+  connectivity_impairment:
+    missing: zero
+    label: Connectivity impairment
+    image_regions:
+      2023: { x: 514, y: 185, width: 20, height: 19 }
+  ai_impairment:
+    missing: zero
+    label: AI impairment
+    image_regions:
+      2023: { x: 588, y: 185, width: 36, height: 19 }
+  total_impairment:
+    missing: zero
+    label: Total reportable segments impairment
+    image_regions:
+      2023: { x: 679, y: 185, width: 36, height: 19 }
+  space_total_costs_and_expenses:
+    label: Space total costs and expenses
+    image_regions:
+      2023: { x: 406, y: 204, width: 36, height: 19 }
+  connectivity_total_costs_and_expenses:
+    label: Connectivity total costs and expenses
+    image_regions:
+      2023: { x: 497, y: 204, width: 36, height: 19 }
+  ai_total_costs_and_expenses:
+    label: AI total costs and expenses
+    image_regions:
+      2023: { x: 588, y: 204, width: 36, height: 19 }
+  total_total_costs_and_expenses:
+    label: Total reportable segments total costs and expenses
+    image_regions:
+      2023: { x: 672, y: 204, width: 43, height: 19 }
+  space_operating_income:
+    label: Space income (loss) from operations
+    image_regions:
+      2023: { x: 425, y: 223, width: 22, height: 19 }
+  connectivity_operating_income:
+    label: Connectivity income (loss) from operations
+    image_regions:
+      2023: { x: 507, y: 223, width: 26, height: 19 }
+  ai_operating_income:
+    label: AI income (loss) from operations
+    image_regions:
+      2023: { x: 584, y: 223, width: 45, height: 19 }
+  total_operating_income:
+    label: Total reportable segments income (loss) from operations
+    image_regions:
+      2023: { x: 675, y: 223, width: 45, height: 19 }
+  space_depreciation_and_amortization:
+    label: Space depreciation and amortization
+    image_regions:
+      2023: { x: 416, y: 337, width: 26, height: 19 }
+  connectivity_depreciation_and_amortization:
+    label: Connectivity depreciation and amortization
+    image_regions:
+      2023: { x: 507, y: 337, width: 26, height: 19 }
+  ai_depreciation_and_amortization:
+    label: AI depreciation and amortization
+    image_regions:
+      2023: { x: 588, y: 337, width: 36, height: 19 }
+  total_depreciation_and_amortization:
+    label: Total reportable segments depreciation and amortization
+    image_regions:
+      2023: { x: 679, y: 337, width: 36, height: 19 }
+  space_share_based_compensation:
+    label: Space share-based compensation
+    image_regions:
+      2023: { x: 416, y: 356, width: 26, height: 19 }
+  connectivity_share_based_compensation:
+    label: Connectivity share-based compensation
+    image_regions:
+      2023: { x: 507, y: 356, width: 26, height: 19 }
+  ai_share_based_compensation:
+    label: AI share-based compensation
+    image_regions:
+      2023: { x: 611, y: 356, width: 13, height: 19 }
+  total_share_based_compensation:
+    label: Total reportable segments share-based compensation
+    image_regions:
+      2023: { x: 689, y: 356, width: 26, height: 19 }
+  space_capital_expenditures:
+    label: Space capital expenditures
+    image_regions:
+      2023: { x: 406, y: 394, width: 36, height: 19 }
+  connectivity_capital_expenditures:
+    label: Connectivity capital expenditures
+    image_regions:
+      2023: { x: 497, y: 394, width: 36, height: 19 }
+  ai_capital_expenditures:
+    label: AI capital expenditures
+    image_regions:
+      2023: { x: 598, y: 394, width: 26, height: 19 }
+  total_capital_expenditures:
+    label: Total reportable segments capital expenditures
+    image_regions:
+      2023: { x: 679, y: 394, width: 36, height: 19 }

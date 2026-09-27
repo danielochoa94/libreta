@@ -1,0 +1,16 @@
+formats:
+  millions:
+    decimals: 0
+
+  integer:
+    decimals: 0
+
+  dollars_per_share:
+    prefix: "$"
+    decimals: 2
+
+  millions_of_shares:
+    decimals: 0
+
+  number_of_years:
+    decimals: 2

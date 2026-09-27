@@ -1,0 +1,150 @@
+table:
+  title: Consolidated Statements of Operations
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026040364/spaceexplorationtechnologib.htm#id286866c4c474ba490d6531a57db9e93_1632
+  image: consolidated-statements-of-operations.png
+  details:
+    Table: Consolidated Statements of Operations
+    Page: F-5
+    Document: SpaceX 2026 S-1/A
+    Extracted: 2026-08-08
+
+defaults:
+  printed: as_is
+
+line_items:
+  revenue:
+    label: Revenue
+    image_regions:
+      2025: { x: 501, y: 104, width: 43, height: 19 }
+      2024: { x: 592, y: 104, width: 43, height: 19 }
+      2023: { x: 683, y: 104, width: 43, height: 19 }
+  cost_of_revenue:
+    label: Cost of revenue
+    sign: contra
+    image_regions:
+      2025: { x: 508, y: 142, width: 36, height: 19 }
+      2024: { x: 599, y: 142, width: 36, height: 19 }
+      2023: { x: 690, y: 142, width: 36, height: 19 }
+  research_and_development:
+    label: Research and development
+    sign: contra
+    image_regions:
+      2025: { x: 508, y: 161, width: 36, height: 19 }
+      2024: { x: 599, y: 161, width: 36, height: 19 }
+      2023: { x: 690, y: 161, width: 36, height: 19 }
+  selling_general_and_administrative:
+    label: Selling, general, and administrative
+    sign: contra
+    image_regions:
+      2025: { x: 508, y: 180, width: 36, height: 19 }
+      2024: { x: 599, y: 180, width: 36, height: 19 }
+      2023: { x: 690, y: 180, width: 36, height: 19 }
+  restructuring_charges:
+    label: Restructuring charges
+    sign: contra
+    image_regions:
+      2025: { x: 518, y: 199, width: 26, height: 19 }
+      2024: { x: 609, y: 199, width: 26, height: 19 }
+      2023: { x: 700, y: 199, width: 26, height: 19 }
+  impairment:
+    label: Impairment
+    sign: contra
+    image_regions:
+      2025: { x: 525, y: 218, width: 20, height: 19 }
+      2024: { x: 616, y: 218, width: 20, height: 19 }
+      2023: { x: 690, y: 218, width: 36, height: 19 }
+  total_costs_and_expenses:
+    label: Total costs and expenses
+    sign: contra
+    image_regions:
+      2025: { x: 501, y: 237, width: 43, height: 19 }
+      2024: { x: 592, y: 237, width: 43, height: 19 }
+      2023: { x: 683, y: 237, width: 43, height: 19 }
+  operating_income:
+    label: Income (loss) from operations
+    image_regions:
+      2025: { x: 504, y: 256, width: 45, height: 19 }
+      2024: { x: 609, y: 256, width: 26, height: 19 }
+      2023: { x: 686, y: 256, width: 45, height: 19 }
+  interest_expense:
+    label: Interest expense
+    printed: negated
+    sign: contra
+    note: Related party of $66, $-, and $- for December 31, 2025, 2024, and 2023, respectively.
+    image_regions:
+      2025: { x: 504, y: 287, width: 45, height: 19 }
+      2024: { x: 595, y: 287, width: 45, height: 19 }
+      2023: { x: 686, y: 287, width: 45, height: 19 }
+  interest_income:
+    label: Interest income
+    image_regions:
+      2025: { x: 518, y: 306, width: 26, height: 19 }
+      2024: { x: 609, y: 306, width: 26, height: 19 }
+      2023: { x: 700, y: 306, width: 26, height: 19 }
+  other_income_expense_net:
+    label: Other income (expense), net
+    image_regions:
+      2025: { x: 514, y: 325, width: 35, height: 19 }
+      2024: { x: 609, y: 325, width: 26, height: 19 }
+      2023: { x: 702, y: 325, width: 29, height: 19 }
+  pretax_income:
+    label: Income (loss) before income taxes
+    image_regions:
+      2025: { x: 504, y: 344, width: 45, height: 19 }
+      2024: { x: 609, y: 344, width: 26, height: 19 }
+      2023: { x: 686, y: 344, width: 45, height: 19 }
+  income_tax_expense:
+    label: Provision for (benefit from) income taxes
+    sign: contra
+    image_regions:
+      2025: { x: 518, y: 363, width: 26, height: 19 }
+      2024: { x: 605, y: 363, width: 35, height: 19 }
+      2023: { x: 696, y: 363, width: 35, height: 19 }
+  net_income:
+    label: Net income (loss)
+    image_regions:
+      2025: { x: 504, y: 382, width: 45, height: 19 }
+      2024: { x: 609, y: 382, width: 26, height: 19 }
+      2023: { x: 686, y: 382, width: 45, height: 19 }
+  net_income_attributable_to_shareholders_basic:
+    label: Net income (loss) attributable to shareholders - basic
+    image_regions:
+      2025: { x: 504, y: 401, width: 45, height: 19 }
+      2024: { x: 616, y: 401, width: 20, height: 19 }
+      2023: { x: 686, y: 401, width: 45, height: 19 }
+  net_income_attributable_to_shareholders_diluted:
+    label: Net income (loss) attributable to shareholders - diluted
+    image_regions:
+      2025: { x: 504, y: 420, width: 45, height: 19 }
+      2024: { x: 616, y: 420, width: 20, height: 19 }
+      2023: { x: 686, y: 420, width: 45, height: 19 }
+  earnings_per_share_basic:
+    label: Basic
+    units: dollars_per_share
+    image_regions:
+      2025: { x: 510, y: 491, width: 39, height: 19 }
+      2024: { x: 606, y: 491, width: 30, height: 19 }
+      2023: { x: 692, y: 491, width: 39, height: 19 }
+  earnings_per_share_diluted:
+    label: Diluted
+    units: dollars_per_share
+    image_regions:
+      2025: { x: 510, y: 510, width: 39, height: 19 }
+      2024: { x: 606, y: 510, width: 30, height: 19 }
+      2023: { x: 692, y: 510, width: 39, height: 19 }
+  weighted_average_shares_basic:
+    label: Basic
+    units: millions_of_shares
+    image_regions:
+      2025: { x: 508, y: 560, width: 36, height: 19 }
+      2024: { x: 599, y: 560, width: 36, height: 19 }
+      2023: { x: 690, y: 560, width: 36, height: 19 }
+  weighted_average_shares_diluted:
+    label: Diluted
+    units: millions_of_shares
+    image_regions:
+      2025: { x: 508, y: 579, width: 36, height: 19 }
+      2024: { x: 599, y: 579, width: 36, height: 19 }
+      2023: { x: 690, y: 579, width: 36, height: 19 }

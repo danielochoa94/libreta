@@ -1,0 +1,8 @@
+line_item,Value
+share_based_compensation_first_year,0.10
+share_based_compensation_long_run,0.03
+share_based_compensation_fade,0.80
+depreciation_rate,0.20
+working_capital_as_percent_of_incremental_revenue,-0.10
+tax_rate,0.21
+net_operating_loss_utilization_limit,0.80

@@ -1,0 +1,35 @@
+table:
+  title: Reconciliation of income (loss) from operations to Segment Adjusted EBITDA
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026052535/spcx-20260630.htm#ib0e99459acb642ca82e016ed95816e66_52
+  image: segment-adjusted-ebitda-h1-2026.png
+  details:
+    Table: Reconciliation of income (loss) from operations to Segment Adjusted EBITDA, six months ended June 30, 2026
+    Page: "47"
+    Document: SpaceX Form 10-Q for the quarter ended June 30, 2026
+    Extracted: 2026-09-23
+  note: >
+    Non-GAAP, defined by the company in Management's Discussion and Analysis. Only the result is stored; checks.yaml
+    rebuilds it from the segment note. Unaudited.
+
+defaults:
+  printed: as_is
+
+line_items:
+  space_adjusted_ebitda:
+    label: Space Segment Adjusted EBITDA
+    image_regions:
+      H1 2026: { x: 462, y: 206, width: 35, height: 19 }
+  connectivity_adjusted_ebitda:
+    label: Connectivity Segment Adjusted EBITDA
+    image_regions:
+      H1 2026: { x: 562, y: 206, width: 36, height: 19 }
+  ai_adjusted_ebitda:
+    label: AI Segment Adjusted EBITDA
+    image_regions:
+      H1 2026: { x: 675, y: 206, width: 26, height: 19 }
+  total_adjusted_ebitda:
+    label: Total reportable segments Segment Adjusted EBITDA
+    image_regions:
+      H1 2026: { x: 769, y: 206, width: 36, height: 19 }

@@ -1,0 +1,51 @@
+title: Revenue
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025, H1 2025, H1 2026, ltm]
+
+rows:
+  - label: Revenue
+    style: header
+  - line: space_revenue
+    label: Space
+    indent: 1
+  - line: connectivity_revenue
+    label: Connectivity
+    indent: 1
+  - line: ai_revenue
+    label: AI
+    indent: 1
+  - line: total_revenue
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Revenue growth
+    style: header
+  - line: space_revenue_growth
+    label: Space
+    indent: 1
+  - line: connectivity_revenue_growth
+    label: Connectivity
+    indent: 1
+  - line: ai_revenue_growth
+    label: AI
+    indent: 1
+  - line: total_revenue_growth
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Share of revenue
+    style: header
+  - line: space_share_of_revenue
+    label: Space
+    indent: 1
+  - line: connectivity_share_of_revenue
+    label: Connectivity
+    indent: 1
+  - line: ai_share_of_revenue
+    label: AI
+    indent: 1

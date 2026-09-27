@@ -1,0 +1,49 @@
+table:
+  title: The Offering
+
+source:
+  url: https://www.sec.gov/Archives/edgar/data/1181412/000162828026042639/spaceexplorationtechnologi.htm#id286866c4c474ba490d6531a57db9e93_480
+  image: equity-awards.png
+  details:
+    Section: The Offering
+    Page: "20"
+    Document: SpaceX final prospectus, Rule 424(b)(4)
+    Extracted: 2026-09-23
+  note: >
+    Outstanding at March 31, 2026, the latest the filings disclose, and printed in whole shares; stored here in
+    millions. Awards exercised, settled or forfeited since are left out.
+
+defaults:
+  units: millions_of_shares
+
+line_items:
+  class_a_options:
+    label: Class A common stock issuable upon the exercise of outstanding stock options
+    image_regions:
+      Value: { x: 127, y: 45, width: 71, height: 19 }
+  class_a_option_exercise_price:
+    label: Weighted-average exercise price per share of Class A common stock
+    units: dollars_per_share
+    image_regions:
+      Value: { x: 567, y: 77, width: 41, height: 19 }
+  class_b_options:
+    label: Class B common stock issuable upon the exercise of outstanding stock options
+    image_regions:
+      Value: { x: 397, y: 45, width: 71, height: 19 }
+  class_b_option_exercise_price:
+    label: Weighted-average exercise price per share of Class B common stock
+    units: dollars_per_share
+    image_regions:
+      Value: { x: 231, y: 93, width: 34, height: 19 }
+  class_a_restricted_stock_units:
+    label: Class A common stock issuable upon the vesting and settlement of restricted stock units
+    image_regions:
+      Value: { x: 127, y: 121, width: 71, height: 19 }
+  class_b_restricted_stock_units:
+    label: Class B common stock issuable upon the vesting and settlement of restricted stock units
+    image_regions:
+      Value: { x: 397, y: 121, width: 48, height: 19 }
+  class_a_restricted_stock_units_granted_after_march:
+    label: Class A common stock issuable upon restricted stock units granted after March 31, 2026
+    image_regions:
+      Value: { x: 127, y: 181, width: 64, height: 19 }

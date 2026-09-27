@@ -1,0 +1,29 @@
+formulas:
+  working_capital:
+    formula: total_current_assets - total_current_liabilities
+  current_ratio:
+    formula: total_current_assets / total_current_liabilities
+    units: times
+
+  total_debt:
+    formula: debt_and_finance_leases_current + debt_and_finance_leases_noncurrent
+  net_debt:
+    formula: total_debt - cash_and_cash_equivalents - marketable_securities
+
+  tangible_book_value:
+    formula: total_shareholders_equity - goodwill - intangible_assets_net
+    note: Equity less the assets that cannot be sold on their own. Negative means reported equity rests on goodwill.
+
+  total_capitalization:
+    formula: total_debt + redeemable_convertible_preferred_stock + total_shareholders_equity
+    note: Preferred stock sits outside equity, so neither total alone shows what the company is financed with.
+
+  total_assets_growth:
+    formula: total_assets / prior(total_assets) - 1
+    units: percent
+
+cell_overrides:
+  total_assets_growth:
+    Jun 2026:
+      blank: true
+      note: Six months after the prior balance sheet, so not comparable with an annual rate.

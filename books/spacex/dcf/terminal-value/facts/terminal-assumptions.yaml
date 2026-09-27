@@ -1,0 +1,17 @@
+table:
+  title: Terminal value assumptions
+
+defaults:
+  units: percent
+
+line_items:
+  perpetual_growth_rate:
+    label: Perpetual growth rate
+    note: >
+      Below the 4.44% risk-free rate, which caps how fast any business can grow forever, and close to long-run U.S.
+      nominal growth.
+  return_on_new_invested_capital:
+    label: Return on new invested capital
+    note: >
+      Above the cost of capital, so growth after 2035 still adds value, but only modestly, since competitors will have
+      had a decade to catch up.

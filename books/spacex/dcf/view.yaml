@@ -1,0 +1,58 @@
+title: DCF
+subtitle: in millions of USD, except per-share data
+
+columns: [Value]
+
+sensitivities: [value_per_share, ai_value_per_share]
+
+rows:
+  - line: valuation_date
+
+  - space: compact
+
+  - line: present_value_of_forecast_cash_flows
+  - line: present_value_of_terminal_value
+  - line: enterprise_value
+    style: subtotal
+  - line: terminal_value_share_of_enterprise_value
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: cash_and_marketable_securities
+    indent: 1
+  - line: debt_and_finance_leases
+    sign: contra
+    indent: 1
+  - line: equity_value
+    style: total
+
+  - space: compact
+
+  - line: basic_shares_outstanding
+  - line: dilutive_options
+    indent: 1
+  - line: restricted_stock_units
+    indent: 1
+  - line: diluted_shares
+    style: subtotal
+
+  - space: compact
+
+  - line: value_per_share
+    style: total
+  - line: share_price
+    label: Share price at the valuation date
+  - line: premium_to_share_price
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - label: At the market price
+    style: header
+  - line: market_capitalization
+    indent: 1
+  - line: market_enterprise_value
+    indent: 1

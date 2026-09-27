@@ -1,0 +1,28 @@
+name: Space Exploration Technologies Corp.
+short_name: SPCX
+description: >
+  Three years of audited statements from the IPO prospectus and the first half of 2026 from the June 2026 quarterly
+  report, reconciled by segment, feeding a segment-driven discounted cash flow valued at June 30, 2026.
+currency: USD
+units: millions
+fiscal_year_end: December 31
+identifiers:
+  cik: "1181412"
+  ticker: SPCX
+
+navigation:
+  - historical/income-statement
+  - historical/balance-sheet
+  - historical/cash-flow
+  - historical/segments:
+      - historical/segments/revenue
+      - historical/segments/profitability
+      - historical/segments/adjusted-ebitda
+      - historical/segments/capital-investment
+      - historical/segments/cost-detail
+  - dcf:
+      - dcf/assumptions
+      - dcf/wacc
+      - dcf/discounted-cash-flow/segments
+      - dcf/discounted-cash-flow
+      - dcf/terminal-value

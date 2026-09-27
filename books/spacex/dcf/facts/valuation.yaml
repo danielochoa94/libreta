@@ -1,0 +1,10 @@
+table:
+  title: Valuation
+
+defaults:
+  units: date
+
+line_items:
+  valuation_date:
+    label: Valuation date
+    note: The date of the first balance sheet after the IPO, which the equity bridge reads cash and debt from.

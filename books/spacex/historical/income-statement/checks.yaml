@@ -1,0 +1,19 @@
+checks:
+  total_costs_and_expenses:
+    formula: cost_of_revenue + research_and_development + selling_general_and_administrative + restructuring_charges + impairment - total_costs_and_expenses
+  operating_income:
+    formula: revenue - total_costs_and_expenses - operating_income
+  pretax_income:
+    formula: operating_income - interest_expense + interest_income + other_income_expense_net - pretax_income
+  net_income:
+    formula: pretax_income - income_tax_expense - net_income
+
+  earnings_per_share_basic:
+    formula: net_income_attributable_to_shareholders_basic / weighted_average_shares_basic - earnings_per_share_basic
+    tolerance: 0.005
+    note: >
+      The filing rounds per-share amounts to cents, so half a cent is rounding and anything more is an extraction error.
+
+  adjusted_ebitda:
+    formula: adjusted_ebitda - historical.segments.total_adjusted_ebitda
+    note: Rebuilding the company's printed Adjusted EBITDA from GAAP lines shows the add-backs are the ones it uses.

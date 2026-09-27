@@ -1,0 +1,98 @@
+formulas:
+  space_revenue_growth:
+    formula: space_revenue / prior(space_revenue) - 1
+    units: percent
+  connectivity_revenue_growth:
+    formula: connectivity_revenue / prior(connectivity_revenue) - 1
+    units: percent
+  ai_revenue_growth:
+    formula: ai_revenue / prior(ai_revenue) - 1
+    units: percent
+  total_revenue_growth:
+    formula: total_revenue / prior(total_revenue) - 1
+    units: percent
+
+  space_share_of_revenue:
+    formula: space_revenue / total_revenue
+    note: The filing reports no inter-segment eliminations, so the segment total is the consolidated company.
+    units: percent
+  connectivity_share_of_revenue:
+    formula: connectivity_revenue / total_revenue
+    units: percent
+  ai_share_of_revenue:
+    formula: ai_revenue / total_revenue
+    units: percent
+
+  space_operating_margin:
+    formula: space_operating_income / space_revenue
+    units: percent
+  connectivity_operating_margin:
+    formula: connectivity_operating_income / connectivity_revenue
+    units: percent
+  ai_operating_margin:
+    formula: ai_operating_income / ai_revenue
+    units: percent
+  total_operating_margin:
+    formula: total_operating_income / total_revenue
+    units: percent
+
+  space_adjusted_ebitda_margin:
+    formula: space_adjusted_ebitda / space_revenue
+    units: percent
+  connectivity_adjusted_ebitda_margin:
+    formula: connectivity_adjusted_ebitda / connectivity_revenue
+    units: percent
+  ai_adjusted_ebitda_margin:
+    formula: ai_adjusted_ebitda / ai_revenue
+    units: percent
+  total_adjusted_ebitda_margin:
+    formula: total_adjusted_ebitda / total_revenue
+    units: percent
+
+  space_capital_intensity:
+    formula: space_capital_expenditures / space_revenue
+    units: times
+    note: Dollars of capital spending per dollar of revenue; above one, a segment is being built rather than run.
+  connectivity_capital_intensity:
+    formula: connectivity_capital_expenditures / connectivity_revenue
+    units: times
+  ai_capital_intensity:
+    formula: ai_capital_expenditures / ai_revenue
+    units: times
+    note: Dollars of capital spending per dollar of revenue; above one, a segment is being built rather than run.
+  total_capital_intensity:
+    formula: total_capital_expenditures / total_revenue
+    units: times
+
+  space_share_of_capital_expenditures:
+    formula: space_capital_expenditures / total_capital_expenditures
+    units: percent
+  connectivity_share_of_capital_expenditures:
+    formula: connectivity_capital_expenditures / total_capital_expenditures
+    units: percent
+  ai_share_of_capital_expenditures:
+    formula: ai_capital_expenditures / total_capital_expenditures
+    units: percent
+
+column_formulas:
+  ltm:
+    label: LTM Jun 2026
+    formula: self["2025"] - self["H1 2025"] + self["H1 2026"]
+    applies_to: facts
+    note: >
+      The twelve months to June 30, 2026: fiscal 2025, less the first half of 2025, plus the first half of 2026. Margins
+      and intensities divide bridged amounts rather than bridging the ratios.
+
+cell_overrides:
+  space_revenue_growth:
+    H1 2025:
+      blank: true
+  connectivity_revenue_growth:
+    H1 2025:
+      blank: true
+  ai_revenue_growth:
+    H1 2025:
+      blank: true
+  total_revenue_growth:
+    H1 2025:
+      blank: true

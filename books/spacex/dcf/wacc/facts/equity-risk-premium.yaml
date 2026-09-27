@@ -1,0 +1,21 @@
+table:
+  title: Equity Risk Premiums, by country - July 2026 Update
+
+source:
+  url: https://www.linkedin.com/pulse/equity-risk-premiums-country-july-2026-update-aswath-damodaran-zti8c
+  image: equity-risk-premium.png
+  details:
+    Document: Aswath Damodaran, July 2026 update
+    Extracted: 2026-09-23
+
+defaults:
+  units: percent
+
+line_items:
+  equity_risk_premium:
+    label: Implied equity risk premium for the United States
+    note: >
+      Implied from S&P 500 prices at the start of July 2026 rather than averaged over history. His 4.17% mature-market
+      premium strips out a 0.25% allowance for US default risk, which a US company bears.
+    image_regions:
+      Value: { x: 133, y: 121, width: 67, height: 26 }

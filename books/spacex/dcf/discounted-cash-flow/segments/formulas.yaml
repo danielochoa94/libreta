@@ -1,0 +1,88 @@
+formulas:
+  space_revenue_growth:
+    formula: dcf.assumptions.revenue_growth_long_run["Space"] + (dcf.assumptions.revenue_growth_first_year["Space"] - dcf.assumptions.revenue_growth_long_run["Space"]) * dcf.assumptions.revenue_growth_fade["Space"] ^ (forecast_year - 1)
+    units: percent
+  space_revenue:
+    formula: prior(space_revenue) * (1 + space_revenue_growth)
+  space_adjusted_ebitda_margin:
+    formula: dcf.assumptions.adjusted_ebitda_margin_long_run["Space"] + (dcf.assumptions.adjusted_ebitda_margin_first_year["Space"] - dcf.assumptions.adjusted_ebitda_margin_long_run["Space"]) * dcf.assumptions.adjusted_ebitda_margin_fade["Space"] ^ (forecast_year - 1)
+    units: percent
+  space_adjusted_ebitda:
+    formula: space_revenue * space_adjusted_ebitda_margin
+  space_capital_intensity:
+    formula: dcf.assumptions.capital_intensity_long_run["Space"] + (dcf.assumptions.capital_intensity_first_year["Space"] - dcf.assumptions.capital_intensity_long_run["Space"]) * dcf.assumptions.capital_intensity_fade["Space"] ^ (forecast_year - 1)
+    units: times
+  space_capital_expenditures:
+    formula: space_revenue * space_capital_intensity
+
+  connectivity_revenue_growth:
+    formula: dcf.assumptions.revenue_growth_long_run["Connectivity"] + (dcf.assumptions.revenue_growth_first_year["Connectivity"] - dcf.assumptions.revenue_growth_long_run["Connectivity"]) * dcf.assumptions.revenue_growth_fade["Connectivity"] ^ (forecast_year - 1)
+    units: percent
+  connectivity_revenue:
+    formula: prior(connectivity_revenue) * (1 + connectivity_revenue_growth)
+  connectivity_adjusted_ebitda_margin:
+    formula: dcf.assumptions.adjusted_ebitda_margin_long_run["Connectivity"] + (dcf.assumptions.adjusted_ebitda_margin_first_year["Connectivity"] - dcf.assumptions.adjusted_ebitda_margin_long_run["Connectivity"]) * dcf.assumptions.adjusted_ebitda_margin_fade["Connectivity"] ^ (forecast_year - 1)
+    units: percent
+  connectivity_adjusted_ebitda:
+    formula: connectivity_revenue * connectivity_adjusted_ebitda_margin
+  connectivity_capital_intensity:
+    formula: dcf.assumptions.capital_intensity_long_run["Connectivity"] + (dcf.assumptions.capital_intensity_first_year["Connectivity"] - dcf.assumptions.capital_intensity_long_run["Connectivity"]) * dcf.assumptions.capital_intensity_fade["Connectivity"] ^ (forecast_year - 1)
+    units: times
+  connectivity_capital_expenditures:
+    formula: connectivity_revenue * connectivity_capital_intensity
+
+  ai_revenue_growth:
+    formula: dcf.assumptions.revenue_growth_long_run["AI"] + (dcf.assumptions.revenue_growth_first_year["AI"] - dcf.assumptions.revenue_growth_long_run["AI"]) * dcf.assumptions.revenue_growth_fade["AI"] ^ (forecast_year - 1)
+    units: percent
+  ai_revenue:
+    formula: prior(ai_revenue) * (1 + ai_revenue_growth)
+  ai_adjusted_ebitda_margin:
+    formula: dcf.assumptions.adjusted_ebitda_margin_long_run["AI"] + (dcf.assumptions.adjusted_ebitda_margin_first_year["AI"] - dcf.assumptions.adjusted_ebitda_margin_long_run["AI"]) * dcf.assumptions.adjusted_ebitda_margin_fade["AI"] ^ (forecast_year - 1)
+    units: percent
+  ai_adjusted_ebitda:
+    formula: ai_revenue * ai_adjusted_ebitda_margin
+  ai_capital_intensity:
+    formula: dcf.assumptions.capital_intensity_long_run["AI"] + (dcf.assumptions.capital_intensity_first_year["AI"] - dcf.assumptions.capital_intensity_long_run["AI"]) * dcf.assumptions.capital_intensity_fade["AI"] ^ (forecast_year - 1)
+    units: times
+  ai_capital_expenditures:
+    formula: ai_revenue * ai_capital_intensity
+
+  total_revenue:
+    formula: space_revenue + connectivity_revenue + ai_revenue
+  total_revenue_growth:
+    formula: total_revenue / prior(total_revenue) - 1
+    units: percent
+  total_adjusted_ebitda:
+    formula: space_adjusted_ebitda + connectivity_adjusted_ebitda + ai_adjusted_ebitda
+  total_adjusted_ebitda_margin:
+    formula: total_adjusted_ebitda / total_revenue
+    units: percent
+  total_capital_expenditures:
+    formula: space_capital_expenditures + connectivity_capital_expenditures + ai_capital_expenditures
+  total_capital_intensity:
+    formula: total_capital_expenditures / total_revenue
+    units: times
+
+column_formulas:
+  actual_2025:
+    label: 2025A
+    formula: historical.segments.self["2025"]
+    note: Reported for the year ended December 31, 2025, the base the forecast grows from.
+  actual_ltm:
+    label: LTM Jun 2026
+    formula: historical.segments.self["ltm"]
+    note: Reported for the twelve months to June 30, 2026.
+
+cell_overrides:
+  space_revenue:
+    2026E:
+      formula: historical.segments.space_revenue["2025"] * (1 + space_revenue_growth)
+  connectivity_revenue:
+    2026E:
+      formula: historical.segments.connectivity_revenue["2025"] * (1 + connectivity_revenue_growth)
+  ai_revenue:
+    2026E:
+      formula: historical.segments.ai_revenue["2025"] * (1 + ai_revenue_growth)
+  total_revenue_growth:
+    2026E:
+      formula: total_revenue / historical.segments.total_revenue["2025"] - 1

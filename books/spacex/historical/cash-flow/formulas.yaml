@@ -1,0 +1,30 @@
+formulas:
+  capital_expenditures:
+    formula: -purchases_of_property_plant_and_equipment
+    note: >
+      The statement records spending as negative cash. Capital expenditures is quoted as a positive amount, so the sign
+      flips here once and everything downstream subtracts it.
+  free_cash_flow:
+    formula: net_cash_from_operating_activities - capital_expenditures
+  capex_coverage:
+    formula: net_cash_from_operating_activities / capital_expenditures
+    units: times
+
+  operating_cash_flow_growth:
+    formula: net_cash_from_operating_activities / prior(net_cash_from_operating_activities) - 1
+    units: percent
+
+  net_cash_from_debt:
+    formula: proceeds_from_debt_and_other_financing_obligations + payment_of_debt_issuance_costs + repayments_on_debt_and_other_financing_obligations + principal_repayments_on_finance_leases
+  net_cash_from_equity:
+    formula: proceeds_from_issuance_of_capital_stock + proceeds_from_employee_equity_award_plans + payments_for_repurchase_of_stock + taxes_paid_for_net_share_settlement
+
+  external_funding_of_the_shortfall:
+    formula: -(net_cash_from_operating_activities + net_cash_from_investing_activities)
+    note: What the year needed from equity and borrowing beyond what operations and investing produced.
+
+  total_share_based_compensation:
+    formula: share_based_compensation + share_based_compensation_capitalized_in_property_plant_and_equipment
+    note: >
+      The expense line understates the awards: the rest is capitalized into assets under construction and reaches the
+      income statement later as depreciation.

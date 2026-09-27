@@ -1,0 +1,19 @@
+checks:
+  total_current_assets:
+    formula: cash_and_cash_equivalents + marketable_securities + accounts_receivable + inventory + prepaid_expenses_and_other_current_assets - total_current_assets
+  total_assets:
+    formula: total_current_assets + property_plant_and_equipment_net + finance_lease_right_of_use_assets + intangible_assets_net + digital_assets + goodwill + deferred_tax_assets + other_assets - total_assets
+
+  total_current_liabilities:
+    formula: accounts_payable + deferred_revenue_current + debt_and_finance_leases_current + accrued_expenses_and_other_current_liabilities - total_current_liabilities
+  total_liabilities:
+    formula: total_current_liabilities + deferred_revenue_noncurrent + debt_and_finance_leases_noncurrent + other_liabilities - total_liabilities
+
+  total_shareholders_equity:
+    formula: preferred_stock + class_a_common_stock + class_b_common_stock + class_c_common_stock + class_d_common_stock + additional_paid_in_capital - accumulated_deficit + accumulated_other_comprehensive_income - total_shareholders_equity
+  total_liabilities_preferred_and_equity:
+    formula: total_liabilities + redeemable_convertible_preferred_stock + total_shareholders_equity - total_liabilities_preferred_and_equity
+
+  balance_sheet_balances:
+    formula: total_assets - total_liabilities_preferred_and_equity
+    note: The one check that is accounting rather than arithmetic.

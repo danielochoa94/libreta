@@ -1,0 +1,91 @@
+title: Adjusted EBITDA Reconciliation
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025, H1 2025, H1 2026, ltm]
+
+rows:
+  - label: Space
+    style: header
+  - line: space_operating_income
+    label: Operating income (loss)
+  - line: space_depreciation_and_amortization
+    label: Depreciation and amortization
+    indent: 1
+  - line: space_share_based_compensation
+    label: Share-based compensation
+    indent: 1
+  - line: space_restructuring_charges
+    label: Restructuring charges
+    indent: 1
+  - line: space_impairment
+    label: Impairment
+    indent: 1
+  - line: space_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+    style: subtotal
+
+  - space: compact
+
+  - label: Connectivity
+    style: header
+  - line: connectivity_operating_income
+    label: Operating income
+  - line: connectivity_depreciation_and_amortization
+    label: Depreciation and amortization
+    indent: 1
+  - line: connectivity_share_based_compensation
+    label: Share-based compensation
+    indent: 1
+  - line: connectivity_restructuring_charges
+    label: Restructuring charges
+    indent: 1
+  - line: connectivity_impairment
+    label: Impairment
+    indent: 1
+  - line: connectivity_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+    style: subtotal
+
+  - space: compact
+
+  - label: AI
+    style: header
+  - line: ai_operating_income
+    label: Operating loss
+  - line: ai_depreciation_and_amortization
+    label: Depreciation and amortization
+    indent: 1
+  - line: ai_share_based_compensation
+    label: Share-based compensation
+    indent: 1
+  - line: ai_restructuring_charges
+    label: Restructuring charges
+    indent: 1
+  - line: ai_impairment
+    label: Impairment
+    indent: 1
+  - line: ai_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+    style: subtotal
+
+  - space: compact
+
+  - label: Total reportable segments
+    style: header
+  - line: total_operating_income
+    label: Operating income (loss)
+  - line: total_depreciation_and_amortization
+    label: Depreciation and amortization
+    indent: 1
+  - line: total_share_based_compensation
+    label: Share-based compensation
+    indent: 1
+  - line: total_restructuring_charges
+    label: Restructuring charges
+    indent: 1
+  - line: total_impairment
+    label: Impairment
+    indent: 1
+  - line: total_adjusted_ebitda
+    label: Segment Adjusted EBITDA
+    style: subtotal

@@ -1,0 +1,75 @@
+title: Discounted Cash Flow
+subtitle: in millions of USD
+
+columns: [2026E, 2027E, 2028E, 2029E, 2030E, 2031E, 2032E, 2033E, 2034E, 2035E]
+
+rows:
+  - line: revenue
+  - line: revenue_growth
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: adjusted_ebitda
+  - line: adjusted_ebitda_margin
+    style: supplemental
+    indent: 1
+  - line: share_based_compensation
+    sign: contra
+    indent: 1
+  - line: depreciation_and_amortization
+    sign: contra
+    indent: 1
+  - line: ebit
+    style: subtotal
+  - line: cash_taxes
+    sign: contra
+    indent: 1
+  - line: nopat
+    style: subtotal
+
+  - space: compact
+
+  - line: depreciation_and_amortization
+    indent: 1
+  - line: capital_expenditures
+    sign: contra
+    indent: 1
+  - line: change_in_net_working_capital
+    sign: contra
+    indent: 1
+  - line: unlevered_free_cash_flow
+    style: total
+
+  - space: compact
+
+  - line: period_end
+  - line: year_fraction
+  - line: cash_flow_after_valuation_date
+  - line: discount_period
+  - line: discount_factor
+  - line: present_value_of_unlevered_free_cash_flow
+    style: total
+
+  - space: compact
+
+  - label: Net operating losses
+    style: header
+  - line: net_operating_loss_used
+    indent: 1
+  - line: net_operating_loss_carryforwards
+    indent: 1
+
+  - space: compact
+
+  - label: Property, plant, and equipment
+    style: header
+  - line: capital_expenditures
+    indent: 1
+  - line: depreciation_and_amortization
+    sign: contra
+    indent: 1
+  - line: property_plant_and_equipment
+    label: Net, at year end
+    style: subtotal

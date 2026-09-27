@@ -1,0 +1,63 @@
+table:
+  title: Segment forecast drivers
+
+source:
+  url: https://aswathdamodaran.substack.com/p/revisiting-the-spacex-valuation-a
+  details:
+    Reference: Aswath Damodaran, Revisiting the SpaceX Valuation, a post-prospectus update
+    Extracted: 2026-09-23
+  note: >
+    Each driver starts at its 2026 value and closes the same share of the remaining gap to its long-run value every
+    year: the fade is the share of the gap still open a year later. First-year values come from the run-rate in the June
+    2026 quarterly report. Long-run values are set against the steady state in Damodaran's post-prospectus valuation,
+    the outside reference for scale and margins.
+
+defaults:
+  units: percent
+
+line_items:
+  revenue_growth_first_year:
+    label: Revenue growth, 2026
+    cell_notes:
+      Space: First-half revenue fell 2% on fewer customer launches, while the second quarter rose 29%.
+      Connectivity: First-half revenue rose 49%, with subscribers doubling to 12.0 million by June 30, 2026.
+      AI: >
+        Second-quarter revenue of $2,561 tripled on $14.1 billion of cloud contracts signed that quarter. 2026 revenue
+        of $11.2 billion needs a second half about 50% above the second-quarter pace as those contracts ramp.
+  revenue_growth_long_run:
+    label: Revenue growth, long run
+    cell_notes:
+      Space: Reaches about $14 billion by 2035; Damodaran's $100 billion of launch revenue by 2036 is left as upside.
+      Connectivity: Reaches about $158 billion by 2035, near the $160 billion Damodaran assumes for Starlink by 2036.
+      AI: Reaches about $175 billion by 2035, close to the $160 billion Damodaran assumes for AI by 2036.
+  revenue_growth_fade:
+    label: Revenue growth fade
+  adjusted_ebitda_margin_first_year:
+    label: Segment Adjusted EBITDA margin, 2026
+    cell_notes:
+      Space: Starship development runs through Space research and development; the first-half margin was (35%).
+      Connectivity: The segment earned 62% in the first half of 2026 and 63% in 2025.
+      AI: The first-half margin was 16% and the second quarter 45%, as cloud contracts came on line.
+  adjusted_ebitda_margin_long_run:
+    label: Segment Adjusted EBITDA margin, long run
+    cell_notes:
+      Space: Space earned 28% to 30% before Starship spending rose; Damodaran's target operating margin is 45%.
+      Connectivity: Damodaran's target operating margin for Starlink is 60%, which is about 70% before depreciation.
+      AI: Damodaran's target operating margin for AI is 25%, which is about 55% before depreciation on compute.
+  adjusted_ebitda_margin_fade:
+    label: Segment Adjusted EBITDA margin fade
+  capital_intensity_first_year:
+    label: Capital expenditures per dollar of revenue, 2026
+    units: times
+    cell_notes:
+      Space: Space spent $1.41 per dollar of revenue in the first half of 2026 and $0.94 in 2025.
+      Connectivity: Connectivity spent $0.36 per dollar of revenue in the first half of 2026 and $0.37 in 2025.
+      AI: >
+        AI spent $23.6 billion in the first half of 2026, $15.8 billion of it in the second quarter. Keeping that pace
+        through the second half makes 2026 spending about five times revenue.
+  capital_intensity_long_run:
+    label: Capital expenditures per dollar of revenue, long run
+    units: times
+    note: Maintenance and growth spending once the constellation, launch fleet and data centers are built out.
+  capital_intensity_fade:
+    label: Capital intensity fade

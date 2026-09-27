@@ -1,0 +1,86 @@
+title: Income Statement
+subtitle: in millions of USD
+
+columns:
+  - source: 2023
+    note: Year ended December 31
+  - source: 2024
+    note: Year ended December 31
+  - source: 2025
+    note: Year ended December 31
+  - cagr
+  - source: H1 2025
+    note: Six months ended June 30, unaudited
+  - source: H1 2026
+    note: Six months ended June 30, unaudited
+  - ltm
+
+rows:
+  - line: revenue
+  - line: revenue_growth
+    label: Revenue growth
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: cost_of_revenue
+    indent: 1
+  - line: gross_profit
+    label: Gross profit
+    style: subtotal
+  - line: gross_margin
+    label: Gross margin
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: research_and_development
+    indent: 1
+  - line: selling_general_and_administrative
+    indent: 1
+  - line: restructuring_charges
+    indent: 1
+  - line: impairment
+    indent: 1
+  - line: total_costs_and_expenses
+    style: subtotal
+
+  - space: compact
+
+  - line: operating_income
+    style: subtotal
+  - line: operating_margin
+    label: Operating margin
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: interest_expense
+    indent: 1
+  - line: interest_income
+    indent: 1
+  - line: other_income_expense_net
+    indent: 1
+  - line: pretax_income
+    style: subtotal
+
+  - space: compact
+
+  - line: income_tax_expense
+    indent: 1
+  - line: net_income
+    style: total
+  - line: net_margin
+    label: Net margin
+    style: supplemental
+    indent: 1
+
+  - space: compact
+
+  - line: adjusted_ebitda
+  - line: adjusted_ebitda_margin
+    style: supplemental
+    indent: 1

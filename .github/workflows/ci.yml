@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: dotnet test src/Libreta.Tests
+      - run: node --test src/Libreta.Tests/*.js
+      - name: Check every book
+        run: |
+          for book in books/*/; do
+            dotnet run --project src/Libreta -- "$book" --check
+          done

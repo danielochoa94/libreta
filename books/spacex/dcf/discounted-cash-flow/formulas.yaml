@@ -1,0 +1,96 @@
+formulas:
+  forecast_year:
+    formula: prior(forecast_year) + 1
+    units: integer
+
+  revenue:
+    formula: dcf.discounted_cash_flow.segments.total_revenue
+  revenue_growth:
+    formula: dcf.discounted_cash_flow.segments.total_revenue_growth
+    units: percent
+  adjusted_ebitda:
+    label: Adjusted EBITDA
+    formula: dcf.discounted_cash_flow.segments.total_adjusted_ebitda
+  adjusted_ebitda_margin:
+    label: Adjusted EBITDA margin
+    formula: adjusted_ebitda / revenue
+    units: percent
+  share_based_compensation:
+    label: Share-based compensation
+    formula: revenue * (dcf.assumptions.share_based_compensation_long_run["Value"] + (dcf.assumptions.share_based_compensation_first_year["Value"] - dcf.assumptions.share_based_compensation_long_run["Value"]) * dcf.assumptions.share_based_compensation_fade["Value"] ^ (forecast_year - 1))
+    note: Adjusted EBITDA excludes it, but it is a real cost to shareholders whose count the equity bridge holds fixed.
+  depreciation_and_amortization:
+    formula: dcf.assumptions.depreciation_rate["Value"] * (prior(property_plant_and_equipment) + capital_expenditures / 2)
+  ebit:
+    label: EBIT
+    formula: adjusted_ebitda - share_based_compensation - depreciation_and_amortization
+
+  net_operating_loss_used:
+    label: NOLs used
+    formula: min(prior(net_operating_loss_carryforwards), dcf.assumptions.net_operating_loss_utilization_limit["Value"] * max(ebit, 0))
+  net_operating_loss_carryforwards:
+    label: NOLs at year end
+    formula: prior(net_operating_loss_carryforwards) + max(-ebit, 0) - net_operating_loss_used
+    note: Losses add to the balance; profits draw it down, at most 80% of each year's EBIT.
+  cash_taxes:
+    formula: dcf.assumptions.tax_rate["Value"] * max(ebit - net_operating_loss_used, 0)
+    note: EBIT stands in for taxable income, and losses carry forward rather than earn a refund.
+  nopat:
+    label: NOPAT
+    formula: ebit - cash_taxes
+
+  capital_expenditures:
+    formula: dcf.discounted_cash_flow.segments.total_capital_expenditures
+  change_in_net_working_capital:
+    formula: (revenue - prior(revenue)) * dcf.assumptions.working_capital_as_percent_of_incremental_revenue["Value"]
+  unlevered_free_cash_flow:
+    formula: nopat + depreciation_and_amortization - capital_expenditures - change_in_net_working_capital
+
+  property_plant_and_equipment:
+    label: Property, plant, and equipment, net
+    formula: prior(property_plant_and_equipment) + capital_expenditures - depreciation_and_amortization
+    note: Rolled forward so depreciation follows the spending that created it, which matters most for AI compute.
+
+  period_end:
+    formula: eomonth(prior(period_end), 12)
+    units: date
+  year_fraction:
+    label: Share of year after the valuation date
+    formula: min((period_end - dcf.valuation_date["Value"]) / (period_end - eomonth(period_end, -12)), 1)
+    units: ratio
+  cash_flow_after_valuation_date:
+    label: Unlevered free cash flow after the valuation date
+    formula: unlevered_free_cash_flow * year_fraction
+    note: The first half of 2026 happened before the valuation date and is already in the June 30 balance sheet.
+  discount_period:
+    formula: (period_end - dcf.valuation_date["Value"]) / 365.25 - year_fraction / 2
+    units: number_of_years
+    note: Mid-period convention, since cash arrives through the year rather than on December 31.
+  discount_factor:
+    formula: 1 / (1 + dcf.wacc.wacc["Value"]) ^ discount_period
+    units: ratio
+  present_value_of_unlevered_free_cash_flow:
+    formula: cash_flow_after_valuation_date * discount_factor
+
+cell_overrides:
+  forecast_year:
+    2026E:
+      value: 1
+  depreciation_and_amortization:
+    2026E:
+      formula: dcf.assumptions.depreciation_rate["Value"] * (historical.balance_sheet.property_plant_and_equipment_net["2025"] + capital_expenditures / 2)
+  net_operating_loss_used:
+    2026E:
+      formula: min(dcf.assumptions.federal_net_operating_loss_carryforwards["Value"], dcf.assumptions.net_operating_loss_utilization_limit["Value"] * max(ebit, 0))
+  net_operating_loss_carryforwards:
+    2026E:
+      formula: dcf.assumptions.federal_net_operating_loss_carryforwards["Value"] + max(-ebit, 0) - net_operating_loss_used
+  change_in_net_working_capital:
+    2026E:
+      formula: (revenue - historical.income_statement.revenue["2025"]) * dcf.assumptions.working_capital_as_percent_of_incremental_revenue["Value"]
+  property_plant_and_equipment:
+    2026E:
+      formula: historical.balance_sheet.property_plant_and_equipment_net["2025"] + capital_expenditures - depreciation_and_amortization
+  period_end:
+    2026E:
+      formula: eomonth(dcf.valuation_date["Value"], 6)

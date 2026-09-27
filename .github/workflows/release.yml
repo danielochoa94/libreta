@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - { runtime: linux-x64, os: ubuntu-latest }
+          - { runtime: linux-arm64, os: ubuntu-latest }
+          # Built on macOS so Apple's own codesign signs the binary, which Apple Silicon requires before it will run it.
+          - { runtime: osx-arm64, os: macos-latest }
+          - { runtime: osx-x64, os: macos-latest }
+          - { runtime: win-x64, os: ubuntu-latest }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      # Trimming discards the runtime's precompiled code, so ReadyToRun restores it or startup doubles; trimming also
+      # turns off reflection-based JSON, which the payloads rely on.
+      - run: >
+          dotnet publish src/Libreta --configuration Release --runtime ${{ matrix.runtime }} --self-contained
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=none
+          -p:PublishTrimmed=true -p:PublishReadyToRun=true -p:JsonSerializerIsReflectionEnabledByDefault=true
+          --output out/libreta
+      - name: Package
+        run: |
+          cp LICENSE NOTICE out/libreta/
+          cd out
+          if [[ "${{ matrix.runtime }}" == win-* ]]; then
+            zip -qr "libreta-${{ matrix.runtime }}.zip" libreta
+          else
+            mv libreta/Libreta libreta/libreta
+            tar -czf "libreta-${{ matrix.runtime }}.tar.gz" libreta
+          fi
+      - uses: actions/upload-artifact@v7
+        with:
+          name: libreta-${{ matrix.runtime }}
+          path: out/libreta-${{ matrix.runtime }}.*
+
+  # Installs each archive the way a user would, from a local server standing in for the release, then checks the
+  # repository's example book with it.
+  install:
+    needs: build
+    strategy:
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - if: runner.os != 'Windows'
+        env:
+          LIBRETA_RELEASE_URL: http://localhost:8000
+        run: |
+          python3 -m http.server 8000 --directory dist &
+          sleep 2
+          sh install.sh
+          ~/.local/bin/libreta books/spacex --check
+          ~/.local/bin/libreta books/spacex --view dcf --json > /dev/null
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          LIBRETA_RELEASE_URL: http://localhost:8000
+        run: |
+          Start-Process python -ArgumentList '-m', 'http.server', '8000', '--directory', 'dist'
+          Start-Sleep 2
+          ./install.ps1
+          & "$env:LOCALAPPDATA\Programs\libreta\Libreta.exe" books\spacex --check
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & "$env:LOCALAPPDATA\Programs\libreta\Libreta.exe" books\spacex --view dcf --json > $null
+
+  publish:
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          merge-multiple: true
+      - run: gh release create "$GITHUB_REF_NAME" dist/* --repo "$GITHUB_REPOSITORY" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

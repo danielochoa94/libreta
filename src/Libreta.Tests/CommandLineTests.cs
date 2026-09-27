@@ -1,0 +1,759 @@
+using System.Text.Json;
+using Shouldly;
+using Xunit;
+
+namespace Libreta.Tests;
+
+[Collection(ConsoleCollection.Name)]
+public class CommandLineTests
+{
+  public static IEnumerable<object[]> BrokenFormulaCases =>
+  [
+    [
+      """
+      formulas:
+        result:
+          formula: result + 1
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+      """,
+      "Circular reference",
+      "v.result[2024]"
+    ],
+    [
+      """
+      formulas:
+        result:
+          formula: intermediate + 1
+        intermediate:
+          formula: typo + 1
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+      """,
+      "typo",
+      "v.result[2024]"
+    ],
+    [
+      """
+      formulas:
+        result:
+          formula: 1
+      column_formulas:
+        ratio:
+          formula: typo + 1
+      """,
+      """
+      title: Review
+      columns: [2024, ratio]
+      rows:
+        - line: result
+      """,
+      "typo",
+      "v.result[v.ratio]"
+    ],
+    [
+      """
+      formulas:
+        result:
+          formula: 1
+      cell_overrides:
+        result:
+          2025:
+            formula: typo + 1
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+      """,
+      "typo",
+      "v.result[2025]"
+    ],
+    [
+      """
+      formulas:
+        result:
+          formula: if(1, 7, broken)
+        broken:
+          formula: sum(result["missing":"2025"])
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+        - line: broken
+      """,
+      "unknown column",
+      "v.broken[2024]"
+    ]
+  ];
+
+  [Fact]
+  public void ParsesEachHeadlessCommand()
+  {
+    // Arrange
+    string[] list = ["books/spacex", "--list"];
+    string[] view = ["books/spacex", "--view", "dcf/wacc", "--json"];
+    string[] value = ["books/spacex", "--value", "dcf/wacc", "beta", "2025"];
+    string[] check = ["books/spacex", "--check"];
+
+    // Act
+    CommandLineOptions listed = CommandLineOptions.Parse(list);
+    CommandLineOptions viewed = CommandLineOptions.Parse(view);
+    CommandLineOptions valued = CommandLineOptions.Parse(value);
+    CommandLineOptions checkOnly = CommandLineOptions.Parse(check);
+
+    // Assert
+    listed.Command.ShouldBe(HeadlessCommand.List);
+    listed.Query.ShouldBeNull();
+    viewed.Command.ShouldBe(HeadlessCommand.View);
+    viewed.Query.ShouldBe(new ViewQuery("dcf/wacc"));
+    viewed.Json.ShouldBeTrue();
+    valued.Command.ShouldBe(HeadlessCommand.Value);
+    valued.Query.ShouldBe(new ViewQuery("dcf/wacc", "beta", "2025"));
+    checkOnly.Command.ShouldBe(HeadlessCommand.Check);
+  }
+
+  [Theory]
+  [InlineData("--docs", DocumentationTopic.Index)]
+  [InlineData("--docs format", DocumentationTopic.Format)]
+  [InlineData("--docs running", DocumentationTopic.Running)]
+  public void ParsesDocumentationCommands(string commandLine, DocumentationTopic topic)
+  {
+    // Arrange
+    string[] arguments = commandLine.Split(' ');
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Documentation.ShouldBe(topic);
+    options.Root.ShouldBeNull();
+  }
+
+  [Theory]
+  [InlineData("--docs unknown")]
+  [InlineData("books/spacex --docs")]
+  [InlineData("--docs --check")]
+  [InlineData("--docs --json")]
+  public void RejectsInvalidDocumentationCommands(string commandLine)
+  {
+    // Arrange
+    string[] arguments = commandLine.Split(' ');
+
+    // Act, Assert
+    Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+  }
+
+  [Theory]
+  [InlineData(DocumentationTopic.Format, "# Book format", "## Project structure")]
+  [InlineData(DocumentationTopic.Running, "# Running Libreta", "## Preview a book")]
+  public void PrintsPackagedDocumentation(
+    DocumentationTopic topic,
+    string expectedHeading,
+    string expectedSection)
+  {
+    // Arrange
+    using var writer = new StringWriter();
+
+    // Act
+    Documentation.Write(topic, writer);
+
+    // Assert
+    string output = writer.ToString();
+    output.ShouldContain(expectedHeading);
+    output.ShouldContain(expectedSection);
+  }
+
+  [Fact]
+  public void ServesWhenNoHeadlessCommandIsGiven()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--port", "5200"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBeNull();
+    options.Root.ShouldBe("books/spacex");
+    options.Port.ShouldBe(5200);
+  }
+
+  [Fact]
+  public void ParsesAnExport()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--export", "spacex.html"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Export);
+    options.Output.ShouldBe("spacex.html");
+    options.Root.ShouldBe("books/spacex");
+  }
+
+  [Theory]
+  [InlineData("books/spacex --export")]
+  [InlineData("books/spacex --export spacex.html --json")]
+  [InlineData("books/spacex --export spacex.html --check")]
+  [InlineData("books/spacex --export spacex.html --port 5200")]
+  public void RejectsIncoherentExports(string commandLine)
+  {
+    // Arrange
+    string[] arguments = commandLine.Split(' ');
+
+    // Act, Assert
+    Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+  }
+
+  [Fact]
+  public void ParsesAUrlLookup()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--url"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Url);
+    options.Root.ShouldBe("books/spacex");
+  }
+
+  [Theory]
+  [InlineData("books/spacex --url --json")]
+  [InlineData("books/spacex --url --port 5200")]
+  [InlineData("books/spacex --url --check")]
+  public void RejectsIncoherentUrlLookups(string commandLine)
+  {
+    // Arrange
+    string[] arguments = commandLine.Split(' ');
+
+    // Act, Assert
+    Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+  }
+
+  [Theory]
+  [InlineData("books/spacex --check --list")]
+  [InlineData("books/spacex --check --port 5200")]
+  [InlineData("books/spacex --json")]
+  [InlineData("books/spacex --value dcf/wacc beta")]
+  public void RejectsIncoherentArguments(string commandLine)
+  {
+    // Arrange
+    string[] arguments = commandLine.Split(' ');
+
+    // Act, Assert
+    Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+  }
+
+  [Fact]
+  public void LeavesTheRootUnsetWhenNoneIsGiven()
+  {
+    // Arrange
+    string[] bare = [];
+    string[] checkOnly = ["--check"];
+
+    // Act
+    CommandLineOptions served = CommandLineOptions.Parse(bare);
+    CommandLineOptions checked_ = CommandLineOptions.Parse(checkOnly);
+
+    // Assert
+    served.Root.ShouldBeNull();
+    served.Command.ShouldBeNull();
+    checked_.Root.ShouldBeNull();
+    checked_.Command.ShouldBe(HeadlessCommand.Check);
+  }
+
+  [Theory]
+  [InlineData(new[] { "books/spacex" }, new[] { "books/spacex" })]
+  [InlineData(new[] { "" }, new[] { "" })]
+  [InlineData(new[] { "books/spacex", "books/spacex/historical" }, new[] { "books/spacex" })]
+  [InlineData(new[] { "books/spacex", "books/acme" }, new[] { "books/acme", "books/spacex" })]
+  [InlineData(new[] { "one/two/three" }, new[] { "one/two/three" })]
+  [InlineData(new[] { "one/two/three/four" }, new string[] { })]
+  [InlineData(new[] { "bin/spacex", "obj/spacex", ".git/spacex" }, new string[] { })]
+  public void FindsEveryBookWithinThreeFoldersWithoutDescendingIntoOne(string[] books, string[] expected)
+  {
+    // Arrange
+    using TreeFixture tree = new(books);
+
+    // Act
+    List<string> found = BookDiscovery.Find(tree.Root);
+
+    // Assert
+    found.ShouldBe(expected.Select(tree.Folder).ToList());
+  }
+
+  [Theory]
+  [MemberData(nameof(BrokenFormulaCases))]
+  public void CheckRejectsBrokenPresentedFormulaGraphs(
+    string formulas,
+    string view,
+    string expectedDefect,
+    string expectedCoordinate)
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(formulas, view);
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldContain(expectedDefect);
+    output.ShouldContain(expectedCoordinate);
+  }
+
+  [Fact]
+  public void CheckJsonReportsPresentedFormulaDefects()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new("""
+      formulas:
+        result:
+          formula: typo + 1
+      """);
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, true);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldContain("\"ok\": false");
+    output.ShouldContain("typo");
+    output.ShouldContain("v.result[2024]");
+  }
+
+  [Fact]
+  public void CheckRejectsUnitsWithNoFormat()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new("""
+      formulas:
+        result:
+          formula: 1
+          units: percnt
+      """);
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldContain("percnt");
+  }
+
+  [Fact]
+  public void CheckAllowsMissingDataAndUnusedConditionalDependencies()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(
+      """
+      formulas:
+        from_empty:
+          formula: input
+        first_prior:
+          formula: prior(input)
+        blanked:
+          formula: input
+        counterpart:
+          formula: missing.self
+        selected:
+          formula: if(1, 7, broken)
+        broken:
+          formula: sum(selected["missing":"2025"])
+      cell_overrides:
+        blanked:
+          2024:
+            blank: true
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: from_empty
+        - line: first_prior
+        - line: blanked
+        - line: counterpart
+        - line: selected
+      """,
+      "line_item,2024,2025\ninput,,2");
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldContain("0 views in error");
+  }
+
+  [Fact]
+  public void CheckRunsEachExplicitCheckOnce()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(
+      """
+      formulas:
+        result:
+          formula: 1
+      """,
+      checks: """
+        checks:
+          result:
+            formula: result
+            expect: 1
+        """);
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldContain("1 checks in 1 views: 1 passed, 0 failed");
+  }
+
+  [Fact]
+  public void CheckRejectsAnInvalidFormulaWhenAnExplicitCheckSelectsIt()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(
+      """
+      formulas:
+        result:
+          formula: if(1, 7, broken)
+        broken:
+          formula: sum(result["missing":"2025"])
+      """,
+      checks: """
+        checks:
+          broken:
+            formula: broken
+            expect: 0
+        """);
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldContain("unknown column");
+  }
+
+  [Fact]
+  public void ViewJsonReturnsACompactRenderedTableAndSkipsAnInvalidUnusedConditionalInput()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new("""
+      formulas:
+        result:
+          formula: if(1, 7, broken)
+        broken:
+          formula: sum(result["missing":"2025"])
+      """);
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.View, new ViewQuery("v"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement payload = document.RootElement;
+    payload.GetProperty("id").GetString().ShouldBe("v");
+    payload.GetProperty("title").GetString().ShouldBe("Review");
+    payload.GetProperty("columns").EnumerateArray()
+      .Select(column => column.GetProperty("name").GetString())
+      .ShouldBe(new[] { "2024", "2025" });
+    JsonElement row = payload.GetProperty("rows")[0];
+    row.GetProperty("name").GetString().ShouldBe("v.result");
+    row.GetProperty("kind").GetString().ShouldBe("formula");
+    row.GetProperty("exact").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "7", "7" });
+    row.GetProperty("display").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "7.00", "7.00" });
+    row.TryGetProperty("cells", out _).ShouldBeFalse();
+    row.TryGetProperty("formula", out _).ShouldBeFalse();
+    row.TryGetProperty("dependencies", out _).ShouldBeFalse();
+    payload.TryGetProperty("calculations", out _).ShouldBeFalse();
+    payload.TryGetProperty("formulas", out _).ShouldBeFalse();
+    payload.TryGetProperty("version", out _).ShouldBeFalse();
+    output.ShouldNotContain("unknown column");
+  }
+
+  [Fact]
+  public void ValueJsonSerializesADeepCalculation()
+  {
+    // Arrange
+    var formulas = new List<string> { "formulas:" };
+    for (int index = 0; index < 40; index++)
+    {
+      string line = index == 0 ? "result" : $"step_{index}";
+      formulas.Add($"  {line}:");
+      formulas.Add($"    formula: step_{index + 1} + 1");
+    }
+    formulas.Add("  step_40:");
+    formulas.Add("    formula: 1");
+    using CheckBookFixture fixture = new(string.Join('\n', formulas));
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("v", "result", "2024"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldContain("\"value\": \"41\"");
+  }
+
+  [Fact]
+  public void ValueErrorsNameTheViewIdAndListThePresentedColumns()
+  {
+    // Arrange
+    using ReviewBookFixture fixture = new();
+
+    // Act
+    InvalidDataException column = Should.Throw<InvalidDataException>(() => Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("cost-review", "result", "Growth YoY"), false));
+    InvalidDataException line = Should.Throw<InvalidDataException>(() => Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("cost-review", "missing", "2024"), false));
+
+    // Assert
+    column.Message.ShouldBe(
+      "'result[Growth YoY]' is not presented by view 'cost-review'. Columns for this line: 2024, 2025, growth");
+    line.Message.ShouldBe("Unknown line 'missing' in view 'cost-review'.");
+  }
+
+  [Theory]
+  [InlineData(HeadlessCommand.View)]
+  [InlineData(HeadlessCommand.Value)]
+  [InlineData(HeadlessCommand.Check)]
+  public void JsonLeavesFormulaPunctuationUnescaped(HeadlessCommand command)
+  {
+    // Arrange
+    using ReviewBookFixture fixture = new();
+    ViewQuery query = command == HeadlessCommand.Value
+      ? new ViewQuery("cost-review", "result", "2024")
+      : new ViewQuery("cost-review");
+
+    // Act
+    (int exitCode, string output) = Run(fixture.Root, command, query, true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldNotContain("\\u00");
+    output.ShouldContain(command == HeadlessCommand.View ? "Growth YoY's" : "1 + 2");
+  }
+
+  [Fact]
+  public void ValueJsonIsACompactCellWithItsCalculationInputsAndDependents()
+  {
+    // Arrange
+    using ReviewBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("cost-review", "change", "2025"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldNotContain("null");
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement cell = document.RootElement;
+    cell.GetProperty("view").GetString().ShouldBe("cost-review");
+    cell.GetProperty("line").GetString().ShouldBe("cost_review.change");
+    cell.GetProperty("column").GetString().ShouldBe("2025");
+    cell.GetProperty("value").GetString().ShouldBe("0");
+    cell.GetProperty("formula").GetString().ShouldBe("result - prior(result)");
+    cell.GetProperty("calculation").GetString().ShouldBe("3 − 3");
+    cell.GetProperty("inputs").EnumerateArray()
+      .Select(input => $"{input.GetProperty("line").GetString()}[{input.GetProperty("column").GetString()}]")
+      .ShouldBe(new[] { "cost_review.result[2025]", "cost_review.result[2024]" });
+    cell.GetProperty("dependents").EnumerateArray()
+      .Select(dependent => dependent.GetProperty("column").GetString())
+      .ShouldBe(new[] { "cost_review.growth" });
+    foreach (string pageOnly in new[] { "cell", "formulas", "tokens", "references", "linked", "start", "region" })
+    {
+      output.ShouldNotContain($"\"{pageOnly}\"");
+    }
+  }
+
+  [Fact]
+  public void ValueJsonWritesOutAnInputNoViewPresents()
+  {
+    // Arrange
+    using ReviewBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("cost-review", "shifted", "2024"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement doubled = document.RootElement.GetProperty("inputs")[0];
+    doubled.GetProperty("line").GetString().ShouldBe("cost_review.doubled");
+    doubled.GetProperty("formula").GetString().ShouldBe("result * 2");
+    doubled.GetProperty("calculation").GetString().ShouldBe("3 × 2");
+    doubled.GetProperty("inputs")[0].GetProperty("line").GetString().ShouldBe("cost_review.result");
+  }
+
+  [Fact]
+  public void ValueJsonPrintsAnUnresolvedCellAndNamesTheMissingPriorPeriod()
+  {
+    // Arrange
+    using ReviewBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.Value, new ViewQuery("cost-review", "change", "2024"), true);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement cell = document.RootElement;
+    cell.GetProperty("unresolved").GetBoolean().ShouldBeTrue();
+    cell.TryGetProperty("value", out _).ShouldBeFalse();
+    cell.GetProperty("calculation").GetString().ShouldBe("3 − ?");
+    JsonElement prior = cell.GetProperty("inputs")[1];
+    prior.GetProperty("line").GetString().ShouldBe("cost_review.result");
+    prior.TryGetProperty("column", out _).ShouldBeFalse();
+    prior.GetProperty("missing").GetString().ShouldBe("no period before 2024");
+  }
+
+  private static (int ExitCode, string Output) RunCheck(string root, bool json)
+  {
+    return Run(root, HeadlessCommand.Check, null, json);
+  }
+
+  private static (int ExitCode, string Output) Run(
+    string root,
+    HeadlessCommand command,
+    ViewQuery? query,
+    bool json)
+  {
+    TextWriter original = Console.Out;
+    using var writer = new StringWriter();
+    try
+    {
+      Console.SetOut(writer);
+      int exitCode = HeadlessRunner.Run(root, command, query, json);
+      return (exitCode, writer.ToString());
+    }
+    finally
+    {
+      Console.SetOut(original);
+    }
+  }
+
+
+  private sealed class TreeFixture : TempFolder
+  {
+    public TreeFixture(params string[] books)
+    {
+      foreach (string book in books)
+      {
+        Write(book.Length == 0 ? "book.yaml" : $"{book}/book.yaml", "name: Book");
+      }
+    }
+
+    public string Folder(string book)
+    {
+      return book.Length == 0 ? Root : PathTo(book);
+    }
+
+
+  }
+
+
+  private sealed class ReviewBookFixture : TempFolder
+  {
+    public ReviewBookFixture()
+    {
+      Write("book.yaml", "name: Review\nshort_name: Review\nnavigation: [cost-review]");
+      Write("cost-review/view.yaml", """
+        title: Growth YoY's review
+        columns: [2024, 2025, growth]
+        rows:
+          - line: result
+          - line: change
+          - line: shifted
+        """);
+      Write("cost-review/formulas.yaml", """
+        formulas:
+          result:
+            formula: 1 + 2
+          change:
+            formula: result - prior(result)
+          doubled:
+            formula: result * 2
+          shifted:
+            formula: doubled + 1
+        column_formulas:
+          growth:
+            label: Growth YoY
+            formula: self["2025"] - self["2024"]
+        """);
+      Write("cost-review/checks.yaml", """
+        checks:
+          sum:
+            formula: 1 + 2 - result
+        """);
+    }
+
+
+  }
+
+  private sealed class CheckBookFixture : TempFolder
+  {
+    public CheckBookFixture(
+      string formulas,
+      string view = """
+        title: Review
+        columns: [2024, 2025]
+        rows:
+          - line: result
+        """,
+      string? factsCsv = null,
+      string? checks = null)
+    {
+      Write("book.yaml", "name: Review\nshort_name: Review\nnavigation: [v]");
+      Write("formats.yaml", "defaults:\n  decimals: 2\nformats:\n  millions: {}");
+      Write("v/view.yaml", view);
+      Write("v/formulas.yaml", formulas);
+      if (checks is not null)
+      {
+        Write("v/checks.yaml", checks);
+      }
+      if (factsCsv is not null)
+      {
+        Write("v/facts/inputs.csv", factsCsv);
+        Write("v/facts/inputs.yaml", """
+          table:
+            title: Inputs
+          defaults:
+            units: millions
+          line_items:
+            input:
+              label: Input
+          """);
+      }
+    }
+
+
+  }
+
+
+}

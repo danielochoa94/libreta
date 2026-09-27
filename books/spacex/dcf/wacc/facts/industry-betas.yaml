@@ -1,0 +1,32 @@
+table:
+  title: Betas by Sector (US)
+
+source:
+  url: https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datafile/Betas.html
+  image: industry-betas.png
+  details:
+    Table: Betas by Sector (US)
+    Column: Unlevered beta corrected for cash
+    Document: Aswath Damodaran, NYU Stern
+    Data as of: January 2026
+    Extracted: 2026-09-23
+  note: >
+    SpaceX has traded since June 12, 2026, too briefly for a regression beta to mean much, so each segment borrows the
+    beta of the industry it competes in.
+
+defaults:
+  units: ratio
+
+line_items:
+  space_unlevered_beta:
+    label: Aerospace/Defense
+    image_regions:
+      Value: { x: 1059, y: 501, width: 36, height: 23 }
+  connectivity_unlevered_beta:
+    label: Telecom (Wireless)
+    image_regions:
+      Value: { x: 1059, y: 2293, width: 36, height: 23 }
+  ai_unlevered_beta:
+    label: Software (Internet)
+    image_regions:
+      Value: { x: 1059, y: 2229, width: 36, height: 23 }

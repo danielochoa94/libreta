@@ -1,0 +1,68 @@
+title: Capital Investment
+subtitle: in millions of USD
+
+columns: [2023, 2024, 2025, H1 2025, H1 2026, ltm]
+
+rows:
+  - label: Capital expenditures
+    style: header
+  - line: space_capital_expenditures
+    label: Space
+    indent: 1
+  - line: connectivity_capital_expenditures
+    label: Connectivity
+    indent: 1
+  - line: ai_capital_expenditures
+    label: AI
+    indent: 1
+  - line: total_capital_expenditures
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Share of capital expenditures
+    style: header
+  - line: space_share_of_capital_expenditures
+    label: Space
+    indent: 1
+  - line: connectivity_share_of_capital_expenditures
+    label: Connectivity
+    indent: 1
+  - line: ai_share_of_capital_expenditures
+    label: AI
+    indent: 1
+
+  - space: compact
+
+  - label: Capital spend per dollar of revenue
+    style: header
+  - line: space_capital_intensity
+    label: Space
+    indent: 1
+  - line: connectivity_capital_intensity
+    label: Connectivity
+    indent: 1
+  - line: ai_capital_intensity
+    label: AI
+    indent: 1
+  - line: total_capital_intensity
+    label: Total reportable segments
+    style: subtotal
+
+  - space: compact
+
+  - label: Depreciation and amortization
+    style: header
+  - line: space_depreciation_and_amortization
+    label: Space
+    indent: 1
+  - line: connectivity_depreciation_and_amortization
+    label: Connectivity
+    indent: 1
+  - line: ai_depreciation_and_amortization
+    label: AI
+    indent: 1
+  - line: total_depreciation_and_amortization
+    label: Total reportable segments
+    style: subtotal

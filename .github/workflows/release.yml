@@ -46,8 +46,8 @@ jobs:
           name: libreta-${{ matrix.runtime }}
           path: out/libreta-${{ matrix.runtime }}.*
 
-  # Installs each archive the way a user would, from a local server standing in for the release, then checks the
-  # repository's example book with it.
+  # Installs each archive the way a user would, from local files standing in for the release, then checks the
+  # repository's example book with it. Windows serves them over HTTP; curl reads file:// URLs directly.
   install:
     needs: build
     strategy:
@@ -61,12 +61,8 @@ jobs:
           path: dist
           merge-multiple: true
       - if: runner.os != 'Windows'
-        env:
-          LIBRETA_RELEASE_URL: http://localhost:8000
         run: |
-          python3 -m http.server 8000 --directory dist &
-          sleep 2
-          sh install.sh
+          LIBRETA_RELEASE_URL="file://${PWD}/dist" sh install.sh
           ~/.local/bin/libreta books/spacex --check
           ~/.local/bin/libreta books/spacex --view dcf --json > /dev/null
       - if: runner.os == 'Windows'

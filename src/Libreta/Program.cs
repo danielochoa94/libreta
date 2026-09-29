@@ -186,7 +186,7 @@ app.MapGet("/api/source-image", (string path) =>
 // Built from the book on disk on each request, like the command line's export, so it is never staler than the page.
 app.MapGet("/api/export/{format}", (string format) =>
 {
-  string name = $"{Path.GetFileName(root)}.{format}";
+  string name = $"{Path.GetFileName(Path.TrimEndingDirectorySeparator(root))}.{format}";
   try
   {
     if (format == "xlsx")

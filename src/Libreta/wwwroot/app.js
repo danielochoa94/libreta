@@ -2560,7 +2560,11 @@ function downloadName(disposition, format) {
 // Fetched rather than linked, so a book that fails to export shows why instead of a failed download.
 async function downloadExport(format) {
   const button = el('export-button');
+  const error = el('error');
   button.disabled = true;
+  // A failed export's message stands until the next attempt; the view's own error, if any, returns in its place.
+  error.hidden = !payload?.error;
+  error.textContent = payload?.error ?? '';
   try {
     const response = await fetch(`/api/export/${format}`);
     if (!response.ok) throw new Error(await response.text() || `The book failed to export (${response.status}).`);
@@ -2571,11 +2575,13 @@ async function downloadExport(format) {
     link.click();
     // Revoking at once can cancel the download before the browser reads the file.
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-  } catch (error) {
-    el('error').hidden = false;
-    el('error').textContent = error.message;
+  } catch (failure) {
+    error.hidden = false;
+    error.textContent = failure.message;
   } finally {
     button.disabled = false;
+    // Disabling the button dropped its focus; return it unless the reader has moved on meanwhile.
+    if (document.activeElement === document.body) button.focus();
   }
 }
 
@@ -2608,7 +2614,6 @@ function chooseExport(event) {
   const format = event.target.closest('[data-format]')?.dataset.format;
   if (!format) return;
   el('export-menu').hidePopover();
-  el('export-button').focus();
   downloadExport(format);
 }
 

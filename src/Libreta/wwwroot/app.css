@@ -278,19 +278,11 @@ body.resize-row {
 
 .navigation > .eyebrow {
   flex: 0 0 auto;
-  display: flex;
   margin-bottom: calc(1 * var(--nav-rem));
-  /* the right padding leaves room for the toggle pinned beside it */
-  padding: 0 calc(2 * var(--nav-rem)) 0 calc(.5 * var(--nav-rem));
+  padding: 0 calc(1.75 * var(--nav-rem)) 0 calc(.5 * var(--nav-rem));
   color: var(--accent);
   font-size: calc(.8 * var(--nav-rem));
   font-weight: 600;
-}
-
-#book-short-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .export-button[aria-expanded="true"] {

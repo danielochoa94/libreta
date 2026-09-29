@@ -285,6 +285,57 @@ body.resize-row {
   font-weight: 600;
 }
 
+.export-button[aria-expanded="true"] {
+  background: var(--hover);
+  color: var(--ink);
+}
+
+.export-button:disabled {
+  cursor: progress;
+  opacity: .6;
+}
+
+.export-button[hidden] {
+  display: none;
+}
+
+/* A popover sits in the top layer; the script places it above the button. */
+.export-menu {
+  position: fixed;
+  inset: auto;
+  min-width: 12rem;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-pop);
+}
+
+.export-menu button {
+  display: flex;
+  width: 100%;
+  gap: var(--space-5);
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.export-menu button:hover,
+.export-menu button:focus {
+  background: var(--hover);
+  outline: none;
+}
+
+.export-menu button span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+}
+
 #view-tree {
   flex: 1 1 auto;
   min-height: 0;

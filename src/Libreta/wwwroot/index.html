@@ -25,6 +25,12 @@
         <button type="button" id="scale-reset" title="Reset text size">Aa</button>
         <input type="range" id="scale" min="70" max="140" step="5" value="100" aria-label="Text size">
         <span id="scale-value">100%</span>
+        <button type="button" class="icon-button export-button" id="export-button" popovertarget="export-menu"
+                aria-haspopup="menu" aria-label="Export the whole book" title="Export the whole book">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 2.5v7.5M4.5 6.5 8 10l3.5-3.5M3 13.5h10"></path>
+          </svg>
+        </button>
         <button type="button" class="icon-button theme-toggle" id="theme-toggle">
           <svg class="icon theme-light" viewBox="0 0 20 20" aria-hidden="true">
             <circle cx="10" cy="10" r="3.5"></circle>
@@ -86,6 +92,10 @@
     <span class="status-indicator" id="dot"></span>
     <span id="status">Connecting</span>
     <button type="button" id="shortcuts-button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+  </div>
+  <div class="export-menu" id="export-menu" popover role="menu" aria-label="Export the whole book">
+    <button type="button" role="menuitem" data-format="xlsx">Excel workbook<span>.xlsx</span></button>
+    <button type="button" role="menuitem" data-format="html">Web page<span>.html</span></button>
   </div>
   <dialog class="shortcuts-dialog" id="shortcuts-dialog" aria-labelledby="shortcuts-title">
     <div class="shortcuts-heading">

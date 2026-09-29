@@ -91,7 +91,7 @@ For you, a live page in the browser:
 
 - It recalculates on every save, so you review the agent's edits as it makes them.
 - Clicking a figure shows its formula with the values it read, and links to its input with optional screenshots of the original source.
-- `libreta --export` writes the whole book, source images included, to one HTML file that works offline.
+- `libreta --export` writes the whole book to one HTML file that works offline, source images included, or to an Excel workbook with a sheet per view.
 
 ## A book in brief
 

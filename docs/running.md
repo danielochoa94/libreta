@@ -129,3 +129,26 @@ libreta books/spacex --export spacex.html
 The page carries every view, its calculations and provenance, and the source images, so it works offline and attached to an email.
 It is a snapshot: it never reloads, and the status bar shows the date it was exported.
 The export refuses a book with a view that fails to load, rather than sharing a broken page.
+
+The export icon at the foot of the navigation downloads this page or the [workbook](#export-a-workbook) from the running server, built from the book as it stands on disk.
+An exported page has no Export button, since it has no server to build one.
+
+## Export a workbook
+
+Write the whole book to an Excel workbook, one sheet per view in navigation order:
+
+```bash
+libreta books/spacex --export spacex.xlsx
+```
+
+Each sheet is laid out like the page, and each cell holds the value the page shows, contra lines included.
+A cell's units become an Excel number format, so the cell keeps its exact value and only the display is scaled and rounded.
+Facts are values and formulas stay formulas, reading the cells they depend on wherever the workbook shows them, so changing an input in Excel flows through.
+A formula that reads a contra cell reads it negated, as shown, and folds the sign into its arithmetic.
+Lines a formula reads that no view shows, such as intermediate steps, go on a final Supporting sheet.
+Unresolved cells are left empty.
+Rows keep their roles: subtotals and totals are bold and ruled, and supplemental lines are italic.
+Numbers are colored as modelers code them: blue for hardcodes, green for links that only read a cell on another sheet, and black for calculations.
+The labels and column labels stay frozen in view as the figures scroll, and gridlines are hidden, as on the page.
+Sources and notes become Excel notes, a line's on its label and a column's on its column label, while a cell carries only what is its own; source images are left out.
+The file extension picks the format, so `--export` accepts only `.html` and `.xlsx`.

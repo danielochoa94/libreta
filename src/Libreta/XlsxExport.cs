@@ -481,9 +481,15 @@ public static class XlsxExport
         row[formula.Column] = row[formula.Column]! with
         {
           Formula = text.Text,
-          Style = Styles.Index(formula.Look with { Ink = text.Linked ? Ink.Link : Ink.Formula })
+          Style = Styles.Index(formula.Look with { Ink = InkOf(formula.Look.Ink, text.Linked) })
         };
       }
+    }
+
+    /// <summary>A formula keeps its row's muted ink, as the page does, unless it links to another sheet.</summary>
+    private static Ink InkOf(Ink role, bool linked)
+    {
+      return linked ? Ink.Link : role == Ink.Muted ? Ink.Muted : Ink.Formula;
     }
 
     /// <summary>A cell at the end of the sheet's last row, taking its address and any formula it calculates.</summary>
@@ -506,7 +512,7 @@ public static class XlsxExport
       }
       string format = ExcelNumberFormat.For(view.Formatter.Spec(cell.Units), PayloadBuilder.ZeroDisplay(view, cell));
       // A formula's color waits on its text, which tells whether it is a link to another sheet.
-      Look look = role with { NumberFormat = format, Ink = Ink.Hardcode };
+      Look look = role with { NumberFormat = format, Ink = cell.Expression is null ? Ink.Hardcode : role.Ink };
       if (cell.Expression is not null)
       {
         formulas.Add(new PendingFormula(sheet, row, column, cell, contra, look));
@@ -668,7 +674,7 @@ public static class XlsxExport
       {
         font.Append(new Color { Rgb = color });
       }
-      font.Append(new FontName { Val = "Calibri" });
+      font.Append(new FontName { Val = "Arial" });
       return font;
     }
 

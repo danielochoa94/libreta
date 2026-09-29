@@ -250,7 +250,7 @@ public class XlsxExportTests
   [Theory]
   [InlineData("Statement", "Revenue", 2, "FF0000FF")]
   [InlineData("Statement", "Gross profit", 2, "FF000000")]
-  [InlineData("Statement", "Growth", 3, "FF000000")]
+  [InlineData("Statement", "Growth", 3, "FF616161")]
   [InlineData("Valuation", "Year end", 2, "FF000000")]
   [InlineData("Valuation", "Total cost", 2, "FF000000")]
   [InlineData("Valuation", "Equity value", 2, "FF000000")]

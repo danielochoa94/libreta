@@ -2583,14 +2583,14 @@ function exportMenuItems() {
   return Array.from(el('export-menu').querySelectorAll('[role="menuitem"]'));
 }
 
-// The browser opens and dismisses the popover; placing it under the button and moving focus is left to the page.
+// The browser opens and dismisses the popover; placing it above the button and moving focus is left to the page.
 function handleExportMenuToggle(event) {
   const open = event.newState === 'open';
   el('export-button').setAttribute('aria-expanded', String(open));
   if (!open) return;
   const anchor = el('export-button').getBoundingClientRect();
   const menu = el('export-menu');
-  menu.style.top = `${anchor.bottom + 4}px`;
+  menu.style.bottom = `${window.innerHeight - anchor.top + 4}px`;
   menu.style.left = `${Math.max(8, Math.min(anchor.left, window.innerWidth - menu.offsetWidth - 8))}px`;
   exportMenuItems()[0].focus();
 }

@@ -11,6 +11,8 @@ namespace Libreta;
 /// shows, or the formula that calculates it, formatted by its units and styled by its row's role.</summary>
 public static class XlsxExport
 {
+  public const string ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
   private const int SheetNameLimit = 31;
   private const int NoteLineLength = 40;
 

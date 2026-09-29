@@ -183,6 +183,31 @@ app.MapGet("/api/source-image", (string path) =>
     ? Results.File(image!, contentType, enableRangeProcessing: true)
     : Results.NotFound());
 
+// Built from the book on disk on each request, like the command line's export, so it is never staler than the page.
+app.MapGet("/api/export/{format}", (string format) =>
+{
+  string name = $"{Path.GetFileName(root)}.{format}";
+  try
+  {
+    if (format == "xlsx")
+    {
+      using var workbook = new MemoryStream();
+      XlsxExport.Write(root, workbook);
+      return Results.File(workbook.ToArray(), XlsxExport.ContentType, name);
+    }
+    if (format == "html")
+    {
+      return Results.File(Encoding.UTF8.GetBytes(HtmlExport.Build(root, assets)), "text/html; charset=utf-8", name);
+    }
+    return Results.NotFound();
+  }
+  catch (Exception exception)
+  {
+    // The page shows the message, as the command line does, so a broken book says what to fix.
+    return Results.Text(exception.Message, "text/plain", statusCode: StatusCodes.Status500InternalServerError);
+  }
+});
+
 // The page holds this open and re-fetches whenever the book changes on disk.
 app.MapGet("/api/events", async (HttpContext context, CancellationToken cancellation) =>
 {

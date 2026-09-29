@@ -2512,6 +2512,7 @@ function isTypingTarget(target) {
 function handleGlobalKeydown(event) {
   if (event.defaultPrevented || isTypingTarget(event.target)) return;
   if (el('shortcuts-dialog').open || el('source-image-dialog').open) return;
+  if (el('export-menu').matches(':popover-open')) return;
 
   const key = event.key.toLowerCase();
   if (pendingShortcut === 'g') {
@@ -2547,6 +2548,68 @@ function handleGlobalKeydown(event) {
     event.preventDefault();
     cycleView(event.key === ']' ? 1 : -1);
   }
+}
+
+/** The file name the server gives an export, from its Content-Disposition header. */
+function downloadName(disposition, format) {
+  const encoded = disposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+  if (encoded) return decodeURIComponent(encoded);
+  return disposition?.match(/filename="?([^";]+)"?/i)?.[1] ?? `book.${format}`;
+}
+
+// Fetched rather than linked, so a book that fails to export shows why instead of a failed download.
+async function downloadExport(format) {
+  const button = el('export-button');
+  button.disabled = true;
+  try {
+    const response = await fetch(`/api/export/${format}`);
+    if (!response.ok) throw new Error(await response.text() || `The book failed to export (${response.status}).`);
+    const url = URL.createObjectURL(await response.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = downloadName(response.headers.get('Content-Disposition'), format);
+    link.click();
+    // Revoking at once can cancel the download before the browser reads the file.
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  } catch (error) {
+    el('error').hidden = false;
+    el('error').textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function exportMenuItems() {
+  return Array.from(el('export-menu').querySelectorAll('[role="menuitem"]'));
+}
+
+// The browser opens and dismisses the popover; placing it under the button and moving focus is left to the page.
+function handleExportMenuToggle(event) {
+  const open = event.newState === 'open';
+  el('export-button').setAttribute('aria-expanded', String(open));
+  if (!open) return;
+  const anchor = el('export-button').getBoundingClientRect();
+  const menu = el('export-menu');
+  menu.style.top = `${anchor.bottom + 4}px`;
+  menu.style.left = `${Math.max(8, Math.min(anchor.left, window.innerWidth - menu.offsetWidth - 8))}px`;
+  exportMenuItems()[0].focus();
+}
+
+function handleExportMenuKeydown(event) {
+  const items = exportMenuItems();
+  const current = items.indexOf(document.activeElement);
+  const moves = { ArrowDown: current + 1, ArrowUp: current - 1, Home: 0, End: items.length - 1 };
+  if (!(event.key in moves)) return;
+  event.preventDefault();
+  items[(moves[event.key] + items.length) % items.length].focus();
+}
+
+function chooseExport(event) {
+  const format = event.target.closest('[data-format]')?.dataset.format;
+  if (!format) return;
+  el('export-menu').hidePopover();
+  el('export-button').focus();
+  downloadExport(format);
 }
 
 function connect() {
@@ -2614,6 +2677,12 @@ el('view-tree').addEventListener('keydown', (event) => {
   if (next !== current) selectNavigationView(buttons[next]);
 });
 
+// An exported page has no server to build an export.
+el('export-button').hidden = Boolean(snapshot);
+el('export-button').setAttribute('aria-expanded', 'false');
+el('export-menu').addEventListener('toggle', handleExportMenuToggle);
+el('export-menu').addEventListener('keydown', handleExportMenuKeydown);
+el('export-menu').addEventListener('click', chooseExport);
 el('shortcuts-button').addEventListener('click', openShortcuts);
 el('shortcuts-close').addEventListener('click', () => el('shortcuts-dialog').close());
 el('source-image-close').addEventListener('click', () => el('source-image-dialog').close());

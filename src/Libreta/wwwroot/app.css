@@ -278,11 +278,91 @@ body.resize-row {
 
 .navigation > .eyebrow {
   flex: 0 0 auto;
+  display: flex;
+  gap: calc(.5 * var(--nav-rem));
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: calc(1 * var(--nav-rem));
-  padding: 0 calc(1.75 * var(--nav-rem)) 0 calc(.5 * var(--nav-rem));
+  /* the right padding leaves room for the toggle pinned beside it */
+  padding: 0 calc(2 * var(--nav-rem)) 0 calc(.5 * var(--nav-rem));
   color: var(--accent);
   font-size: calc(.8 * var(--nav-rem));
   font-weight: 600;
+}
+
+#book-short-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.export-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: calc(.3 * var(--nav-rem));
+  align-items: center;
+  padding: calc(.15 * var(--nav-rem)) calc(.45 * var(--nav-rem));
+  border: 1px solid var(--rule);
+  border-radius: calc(.25 * var(--nav-rem));
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.export-button:hover,
+.export-button[aria-expanded="true"] {
+  background: var(--hover);
+  color: var(--accent);
+}
+
+.export-button:disabled {
+  cursor: progress;
+  opacity: .6;
+}
+
+.export-button[hidden] {
+  display: none;
+}
+
+.export-button svg {
+  width: calc(.85 * var(--nav-rem));
+  height: calc(.85 * var(--nav-rem));
+}
+
+/* A popover sits in the top layer; the script places it under the button. */
+.export-menu {
+  position: fixed;
+  inset: auto;
+  min-width: 12rem;
+  margin: 0;
+  padding: var(--space-1);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-pop);
+}
+
+.export-menu button {
+  display: flex;
+  width: 100%;
+  gap: var(--space-5);
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.export-menu button:hover,
+.export-menu button:focus {
+  background: var(--hover);
+  outline: none;
+}
+
+.export-menu button span {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
 }
 
 #view-tree {

@@ -144,4 +144,8 @@ Facts are values and formulas stay formulas, reading the cells they depend on wh
 A formula that reads a contra cell reads it negated, as shown, and folds the sign into its arithmetic.
 Lines a formula reads that no view shows, such as intermediate steps, go on a final Supporting sheet.
 Unresolved cells are left empty.
+Rows keep their roles: subtotals and totals are bold and ruled, and supplemental lines are italic.
+Numbers are colored as modelers code them: blue for hardcodes, green for links that only read a cell on another sheet, and black for calculations.
+The labels and column labels stay frozen in view as the figures scroll, and gridlines are hidden, as on the page.
+Sources and notes become Excel notes, a line's on its label and a column's on its column label, while a cell carries only what is its own; source images are left out.
 The file extension picks the format, so `--export` accepts only `.html` and `.xlsx`.

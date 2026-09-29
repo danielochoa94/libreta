@@ -19,6 +19,10 @@ public readonly record struct ExcelAddress(string Sheet, int Row, int Column, bo
   }
 }
 
+/// <summary>A formula without its leading equals sign; <c>Linked</c> when it only reads a cell on another sheet,
+/// negated or not, and does no arithmetic of its own.</summary>
+public readonly record struct ExcelFormulaText(string Text, bool Linked);
+
 /// <summary>A formula as Excel writes it, reading each cell where the workbook shows it. Cells show the page's sign, so
 /// a contra cell reads negated; the negations are folded into the arithmetic rather than stacked.</summary>
 public sealed class ExcelFormula
@@ -48,11 +52,14 @@ public sealed class ExcelFormula
     };
   }
 
-  /// <summary>The formula text without its leading equals sign, written on <paramref name="sheet"/>.</summary>
-  public string Write(Expr expression, string column, string scope, string line, string sheet, bool negate)
+  /// <summary>The formula as written on <paramref name="sheet"/>.</summary>
+  public ExcelFormulaText Write(Expr expression, string column, string scope, string line, string sheet, bool negate)
   {
     Node node = Translate(expression, column, scope, line, sheet, false);
-    return Render(negate ? Negate(node) : node);
+    Node formula = negate ? Negate(node) : node;
+    // A contra cell's minus comes from the sign the page shows, not from any arithmetic the reader should audit.
+    bool linked = formula is Atom { Linked: true } or Negation { Operand: Atom { Linked: true } };
+    return new ExcelFormulaText(Render(formula), linked);
   }
 
   private Node Translate(Expr expression, string column, string scope, string line, string sheet, bool condition)
@@ -158,7 +165,7 @@ public sealed class ExcelFormula
   private Node Reference(CellCoordinate coordinate, string sheet)
   {
     ExcelAddress address = Address(coordinate, sheet);
-    var atom = new Atom(Qualifier(address, sheet) + address.Cell);
+    var atom = new Atom(Qualifier(address, sheet) + address.Cell, address.Sheet != sheet);
     return address.Negated ? new Negation(atom) : atom;
   }
 
@@ -286,7 +293,8 @@ public sealed class ExcelFormula
 
   private abstract record Node(int Precedence);
 
-  private sealed record Atom(string Text) : Node(6);
+  /// <summary><c>Linked</c> marks a reference to a cell on another sheet.</summary>
+  private sealed record Atom(string Text, bool Linked = false) : Node(6);
 
   private sealed record Call(string Name, List<Node> Arguments) : Node(6);
 

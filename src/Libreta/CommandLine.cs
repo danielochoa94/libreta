@@ -142,6 +142,10 @@ public class CommandLineOptions
           Require(arguments, index, 1);
           command = HeadlessCommand.Export;
           output = arguments[++index];
+          if (Path.GetExtension(output).ToLowerInvariant() is not (".html" or ".htm" or ".xlsx"))
+          {
+            throw new ArgumentException("--export writes a page (.html) or a workbook (.xlsx); name the file for one.");
+          }
           break;
         case "--url":
           RequireNoCommand(command, argument);
@@ -212,6 +216,7 @@ public class CommandLineOptions
     writer.WriteLine("  libreta [<book-root>] --value <view-id> <line> <column> [--json]");
     writer.WriteLine("  libreta [<book-root>] --check [--json]");
     writer.WriteLine("  libreta [<book-root>] --export <file.html>   (the whole book as one self-contained page)");
+    writer.WriteLine("  libreta [<book-root>] --export <file.xlsx>   (the whole book as a workbook, a sheet per view)");
     writer.WriteLine("  libreta [<book-root>] --url   (the address of the server already running the book)");
     writer.WriteLine("  libreta --docs [format|running]");
     writer.WriteLine();

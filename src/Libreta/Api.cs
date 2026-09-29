@@ -706,15 +706,19 @@ public static class PayloadBuilder
 
   private static string Display(View view, ResolvedCell cell, bool contra)
   {
+    double value = contra ? -cell.Value!.Value : cell.Value!.Value;
+    return value == 0 && ZeroDisplay(view, cell) is string zero ? zero : view.Formatter.Format(cell.Units, value);
+  }
+
+  /// <summary>The text a zero shows as, or null when it shows as a formatted number.</summary>
+  public static string? ZeroDisplay(View view, ResolvedCell cell)
+  {
     if (cell.FactCell?.PrintedDash == true || cell.Omitted)
     {
       return view.Formatter.Dash;
     }
-    double value = contra ? -cell.Value!.Value : cell.Value!.Value;
     // A sourced fact keeps its printed zero; a hardcoded override has no source scale to round at.
-    return cell.Kind == "formula" || cell.FactCell is null
-      ? view.Formatter.FormatCalculated(cell.Units, value)
-      : view.Formatter.Format(cell.Units, value);
+    return cell.Kind == "formula" || cell.FactCell is null ? view.Formatter.Zero : null;
   }
 
   private static SourcePayload? Source(Fact? fact)

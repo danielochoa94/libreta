@@ -22,6 +22,8 @@ public class Formatter
 
   public string Dash => formats.Dash;
 
+  public string? Zero => formats.Zero;
+
   /// <summary>A calculated or hardcoded zero may read as a dash; a sourced fact keeps its printed zero, which may mean "tiny".</summary>
   public string FormatCalculated(string? units, double amount)
   {
@@ -231,7 +233,7 @@ public class Formatter
     return fullBookRoot;
   }
 
-  private FormatSpec Spec(string? units)
+  public FormatSpec Spec(string? units)
   {
     string? key = units ?? formats.DefaultUnits;
     if (key is null)

@@ -92,7 +92,17 @@ if (options.Command == HeadlessCommand.Export)
 {
   try
   {
-    File.WriteAllText(options.Output!, HtmlExport.Build(root, InterfaceFolder()));
+    if (Path.GetExtension(options.Output!).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+    {
+      // Built in memory so a book that fails to export leaves no half-written workbook behind.
+      using var workbook = new MemoryStream();
+      XlsxExport.Write(root, workbook);
+      File.WriteAllBytes(options.Output!, workbook.ToArray());
+    }
+    else
+    {
+      File.WriteAllText(options.Output!, HtmlExport.Build(root, InterfaceFolder()));
+    }
     Console.WriteLine($"  wrote {options.Output} ({new FileInfo(options.Output!).Length / 1024} KB)");
     return 0;
   }

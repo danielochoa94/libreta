@@ -205,8 +205,24 @@ public class CommandLineTests
     options.Root.ShouldBe("books/spacex");
   }
 
+  [Fact]
+  public void ParsesAWorkbookExport()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--export", "spacex.XLSX"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Export);
+    options.Output.ShouldBe("spacex.XLSX");
+  }
+
   [Theory]
   [InlineData("books/spacex --export")]
+  [InlineData("books/spacex --export spacex.csv")]
+  [InlineData("books/spacex --export spacex")]
   [InlineData("books/spacex --export spacex.html --json")]
   [InlineData("books/spacex --export spacex.html --check")]
   [InlineData("books/spacex --export spacex.html --port 5200")]

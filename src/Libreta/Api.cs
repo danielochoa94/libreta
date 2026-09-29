@@ -704,7 +704,7 @@ public static class PayloadBuilder
       : view.Formulas.TryGetValue(name, out Formula? formula) ? formula.Scope : null;
   }
 
-  private static string Display(View view, ResolvedCell cell, bool contra)
+  public static string Display(View view, ResolvedCell cell, bool contra)
   {
     double value = contra ? -cell.Value!.Value : cell.Value!.Value;
     return value == 0 && ZeroDisplay(view, cell) is string zero ? zero : view.Formatter.Format(cell.Units, value);

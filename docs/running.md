@@ -140,5 +140,8 @@ libreta books/spacex --export spacex.xlsx
 
 Each sheet is laid out like the page, and each cell holds the value the page shows, contra lines included.
 A cell's units become an Excel number format, so the cell keeps its exact value and only the display is scaled and rounded.
+Facts are values and formulas stay formulas, reading the cells they depend on wherever the workbook shows them, so changing an input in Excel flows through.
+A formula that reads a contra cell reads it negated, as shown, and folds the sign into its arithmetic.
+Lines a formula reads that no view shows, such as intermediate steps, go on a final Supporting sheet.
 Unresolved cells are left empty.
 The file extension picks the format, so `--export` accepts only `.html` and `.xlsx`.

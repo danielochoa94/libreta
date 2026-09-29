@@ -18,7 +18,7 @@ public class XlsxExportTests
     using XLWorkbook workbook = fixture.Export();
 
     // Assert
-    workbook.Worksheets.Select(sheet => sheet.Name).ShouldBe(new[] { "Statement", "Valuation" });
+    workbook.Worksheets.Select(sheet => sheet.Name).ShouldBe(new[] { "Statement", "Valuation", "Supporting" });
   }
 
   [Fact]
@@ -181,6 +181,114 @@ public class XlsxExportTests
     date.GetDateTime().ShouldBe(new DateTime(2026, 6, 30));
   }
 
+  [Fact]
+  public void LeavesFactsAsValues()
+  {
+    // Arrange
+    using ExportFixture fixture = new ExportFixture();
+
+    // Act
+    using XLWorkbook workbook = fixture.Export();
+
+    // Assert
+    Row(workbook.Worksheet("Statement"), "Revenue").Cell(2).HasFormula.ShouldBeFalse();
+  }
+
+  [Fact]
+  public void WritesFormulasOverTheCellsThePageShows()
+  {
+    // Arrange
+    using ExportFixture fixture = new ExportFixture();
+
+    // Act
+    using XLWorkbook workbook = fixture.Export();
+
+    // Assert
+    IXLWorksheet sheet = workbook.Worksheet("Statement");
+    Row(sheet, "Gross profit").Cell(2).FormulaA1.ShouldBe("B6+B7");
+    Row(sheet, "Growth").Cell(3).FormulaA1.ShouldBe("C6/B6-1");
+  }
+
+  [Fact]
+  public void ReadsAnotherViewOnItsSheet()
+  {
+    // Arrange
+    using ExportFixture fixture = new ExportFixture();
+
+    // Act
+    using XLWorkbook workbook = fixture.Export();
+
+    // Assert
+    IXLWorksheet sheet = workbook.Worksheet("Valuation");
+    Row(sheet, "Total cost").Cell(2).FormulaA1.ShouldBe("-SUM('Statement'!B7:C7)");
+    Row(sheet, "Year end").Cell(2).FormulaA1.ShouldBe("EOMONTH(B4,6)");
+    Row(sheet, "Capped value").Cell(2).FormulaA1.ShouldBe("IF(B7>500,500,B7)");
+  }
+
+  [Fact]
+  public void ShowsLinesNoViewPresentsOnASupportingSheet()
+  {
+    // Arrange
+    using ExportFixture fixture = new ExportFixture();
+
+    // Act
+    using XLWorkbook workbook = fixture.Export();
+
+    // Assert
+    IXLRow multiple = Row(workbook.Worksheet("Supporting"), "Multiple");
+    multiple.Cell(2).GetDouble().ShouldBe(8);
+    Row(workbook.Worksheet("Valuation"), "Equity value").Cell(2).FormulaA1
+      .ShouldBe($"'Statement'!C8*'Supporting'!B{multiple.RowNumber()}");
+  }
+
+  [Fact]
+  public void RecalculatesEveryFormulaToTheValueThePageShows()
+  {
+    // Arrange
+    using ExportFixture fixture = new ExportFixture();
+    using XLWorkbook workbook = fixture.Export();
+    List<IXLCell> formulas = workbook.Worksheets.SelectMany(sheet => sheet.CellsUsed(cell => cell.HasFormula)).ToList();
+
+    // Act
+    List<(string Cell, double Shown, double Recalculated)> results = formulas
+      .Select(cell => (cell.Address.ToString(XLReferenceStyle.A1, true), Number(cell.CachedValue), Recalculate(cell)))
+      .ToList();
+
+    // Assert
+    formulas.Count.ShouldBe(9);
+    results.ShouldAllBe(result => Math.Abs(result.Shown - result.Recalculated) < 1e-9);
+  }
+
+  [Theory]
+  [InlineData("a - b", false, "B4+B5", 1)]
+  [InlineData("a + b", false, "B4-B5", 5)]
+  [InlineData("a - b", true, "-B4-B5", -1)]
+  [InlineData("b - a", true, "B5+B4", 1)]
+  [InlineData("a - (a - b)", false, "B4-(B4+B5)", 2)]
+  [InlineData("a / (b + 1)", false, "B4/(1-B5)", 1)]
+  [InlineData("a + b / 2", false, "B4-B5/2", 4)]
+  [InlineData("a * b", false, "-B4*B5", 6)]
+  [InlineData("a * b", true, "B4*B5", -6)]
+  [InlineData("-a ^ 2", false, "-(B4^2)", -9)]
+  [InlineData("b ^ 2", false, "(-B5)^2", 4)]
+  [InlineData("a > b", false, "IF(B4>-B5,1,0)", 1)]
+  [InlineData("if(a > b, a, b)", false, "IF(B4>-B5,B4,-B5)", 3)]
+  [InlineData("max(a, b) / 2", false, "MAX(B4,-B5)/2", 1.5)]
+  public void WritesFormulasInThePageSign(string formula, bool contra, string expected, double shown)
+  {
+    // Arrange
+    using FormulaFixture fixture = new FormulaFixture(formula, contra);
+
+    // Act
+    using XLWorkbook workbook = fixture.Export();
+
+    // Assert
+    IXLCell result = Row(workbook.Worksheet("Model"), "Result").Cell(2);
+    result.FormulaA1.ShouldBe(expected);
+    result.GetDouble().ShouldBe(shown);
+    Recalculate(result).ShouldBe(shown, 1e-12);
+  }
+
   [Theory]
   [InlineData("Cash flow: detail", "Cash flow detail")]
   [InlineData("A/B [draft]?", "A B draft")]
@@ -231,11 +339,59 @@ public class XlsxExportTests
       .ToArray();
   }
 
+  /// <summary>Evaluates the formula afresh, reading its inputs as the workbook holds them.</summary>
+  private static double Recalculate(IXLCell cell)
+  {
+    return Number(cell.Worksheet.Evaluate(cell.FormulaA1, cell.Address.ToString()));
+  }
+
+  private static double Number(XLCellValue value)
+  {
+    return value.IsDateTime ? value.GetDateTime().ToOADate() : value.GetNumber();
+  }
+
+  private sealed class FormulaFixture : TempFolder
+  {
+    public FormulaFixture(string formula, bool contra)
+    {
+      Write("formats.yaml", "formats:\n  millions:\n    decimals: 1\n");
+      Write("book.yaml", "name: Formula book\nshort_name: FOR\nnavigation: [model]\n");
+      Write("model/facts/inputs.csv", "line_item,2025\na,3\nb,2\n");
+      Write("model/facts/inputs.yaml", """
+        table:
+          title: Inputs
+        defaults:
+          units: millions
+        line_items:
+          b:
+            sign: contra
+        """);
+      Write("model/formulas.yaml", $"formulas:\n  result:\n    formula: {formula}\n    units: millions\n");
+      Write("model/view.yaml", $"""
+        title: Model
+        columns: ["2025"]
+        rows:
+          - line: a
+          - line: b
+          - line: result
+            sign: {(contra ? "contra" : "additive")}
+        """);
+    }
+
+    public XLWorkbook Export()
+    {
+      var stream = new MemoryStream();
+      XlsxExport.Write(Root, stream);
+      stream.Position = 0;
+      return new XLWorkbook(stream);
+    }
+  }
+
   private sealed class ExportFixture : TempFolder
   {
     public ExportFixture()
     {
-      Write("formats.yaml", "formats:\n  millions:\n    decimals: 0\n");
+      Write("formats.yaml", "formats:\n  millions:\n    decimals: 0\n  multiple:\n    decimals: 1\n    suffix: x\n");
       Write("book.yaml", "name: Export book\nshort_name: EXP\nnavigation: [statement, valuation]\n");
       Write("statement/facts/income.csv",
         "line_item,2024,2025\nrevenue,90,120\ncost_of_revenue,-40,-50\nother_income,-,3\n");
@@ -287,7 +443,7 @@ public class XlsxExportTests
           - line: unchanged
           - line: other_income
         """);
-      Write("valuation/facts/inputs.csv", "line_item,Value\nvaluation_date,2026-06-30\n");
+      Write("valuation/facts/inputs.csv", "line_item,Value\nvaluation_date,2026-06-30\nmultiple,8\n");
       Write("valuation/facts/inputs.yaml", """
         table:
           title: Inputs
@@ -296,8 +452,34 @@ public class XlsxExportTests
         line_items:
           valuation_date:
             label: Valuation date
+          multiple:
+            units: multiple
         """);
-      Write("valuation/view.yaml", "title: Valuation\ncolumns: [Value]\nrows:\n  - line: valuation_date\n");
+      Write("valuation/formulas.yaml", """
+        formulas:
+          year_end:
+            formula: eomonth(valuation_date, 6)
+            units: date
+          total_cost:
+            formula: sum(statement.cost_of_revenue["2024":"2025"])
+            units: millions
+          equity_value:
+            formula: statement.gross_profit["2025"] * multiple
+            units: millions
+          capped_value:
+            formula: if(equity_value > 500, 500, equity_value)
+            units: millions
+        """);
+      Write("valuation/view.yaml", """
+        title: Valuation
+        columns: [Value]
+        rows:
+          - line: valuation_date
+          - line: year_end
+          - line: total_cost
+          - line: equity_value
+          - line: capped_value
+        """);
     }
 
     public XLWorkbook Export()

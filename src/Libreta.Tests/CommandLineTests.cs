@@ -140,6 +140,62 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void ParsesTheCellALaunchOpensAt()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--cell", "historical.segments.ai_revenue", "H1 2026"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBeNull();
+    options.Cell.ShouldBe(("historical.segments.ai_revenue", "H1 2026"));
+  }
+
+  [Fact]
+  public void CellCannotCombineWithAHeadlessCommand()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--cell", "historical.segments.ai_revenue", "2025", "--list"];
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+
+    // Assert
+    exception.Message.ShouldBe("--cell opens the page, so it cannot be combined with a headless command.");
+  }
+
+  [Fact]
+  public void ACellLinkOpensTheViewPresentingItAndSelectsIt()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "statement.gross_profit", "2025");
+
+    // Assert
+    query.ShouldBe("/?view=statement&line=statement.gross_profit&column=2025");
+  }
+
+  [Fact]
+  public void ACellLinkToAnUnknownLineFails()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(
+      () => CellLink.Query(fixture.Root, "statement.net_income", "2025"));
+
+    // Assert
+    exception.Message.ShouldBe("Unknown line 'statement.net_income'.");
+  }
+
+  [Fact]
   public void ParsesLinesWithNoNames()
   {
     // Arrange

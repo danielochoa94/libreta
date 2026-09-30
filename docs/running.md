@@ -33,6 +33,14 @@ Print that server's address without opening anything:
 libreta books/spacex --url
 ```
 
+Open the page at one cell, selected with the inspector showing it, by the line's qualified name and the column:
+
+```bash
+libreta books/spacex --cell historical.segments.connectivity_revenue 2025
+```
+
+The page shows the first view in navigation order that presents the cell, or failing that the line; a tool linking to the book, such as a slide deck tracing a number, runs this.
+
 The server stops about ten seconds after its last tab closes, long enough for a reload to reconnect.
 It keeps running until a first tab connects, and `Ctrl+C` stops it at any time.
 The command always prints the address as well, for sessions with no browser to open, such as over SSH.

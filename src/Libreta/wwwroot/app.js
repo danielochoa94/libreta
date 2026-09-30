@@ -320,10 +320,12 @@ async function refresh() {
     }
     if (activeView !== previousView) clearViewState();
     let restored = null;
+    let cell = null;
     if (!revealedInitialView) {
       revealedInitialView = true;
       expandAncestors(activeView);
-      restored = savedViewState(activeView);
+      cell = takeRequestedCell();
+      restored = cell ? null : savedViewState(activeView);
       if (restored) restoreViewState(restored);
     }
     if (activeView === null) {
@@ -334,7 +336,9 @@ async function refresh() {
     }
     updateUrl(activeView, true);
     renderNavigation();
-    if (await load() && restored) revealViewState(restored);
+    const loaded = await load();
+    if (loaded && restored) revealViewState(restored);
+    if (loaded && cell) openCoordinate(cell.line, cell.column);
   } catch (error) {
     if (!requests.acceptCatalog(sequence)) return;
     catalog = { name: '', views: [] };
@@ -495,6 +499,19 @@ function clearViewState() {
 function requestedView() {
   const url = new URL(location.href);
   return snapshot ? new URLSearchParams(url.hash.slice(1)).get('view') : url.searchParams.get('view');
+}
+
+// A tool opening the book at a cell names it once in the query, and a reload keeps only the view.
+function takeRequestedCell() {
+  if (snapshot) return null;
+  const url = new URL(location.href);
+  const line = url.searchParams.get('line');
+  if (!line) return null;
+  const cell = { line, column: url.searchParams.get('column') };
+  url.searchParams.delete('line');
+  url.searchParams.delete('column');
+  history.replaceState(history.state, '', url);
+  return cell;
 }
 
 function updateUrl(id, replace) {

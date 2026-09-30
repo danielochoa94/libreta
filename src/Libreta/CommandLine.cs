@@ -98,6 +98,8 @@ public class CommandLineOptions
   public HeadlessCommand? Command { get; private init; }
   public ViewQuery? Query { get; private init; }
   public List<string>? Lines { get; private init; }
+  /// <summary>The cell a launch opens the page at, by qualified line and column name.</summary>
+  public (string Line, string Column)? Cell { get; private init; }
   public string? Output { get; private init; }
   public bool Json { get; private init; }
   public bool Help { get; private init; }
@@ -118,6 +120,7 @@ public class CommandLineOptions
     HeadlessCommand? command = null;
     ViewQuery? query = null;
     List<string>? lines = null;
+    (string, string)? cell = null;
     string? output = null;
     bool json = false;
     DocumentationTopic? documentation = null;
@@ -156,6 +159,11 @@ public class CommandLineOptions
           command = HeadlessCommand.Lines;
           lines = arguments.Skip(index + 1).TakeWhile(name => !name.StartsWith('-')).ToList();
           index += lines.Count;
+          break;
+        case "--cell":
+          Require(arguments, index, 2);
+          cell = (arguments[index + 1], arguments[index + 2]);
+          index += 2;
           break;
         case "--check":
           RequireNoCommand(command, argument);
@@ -213,8 +221,12 @@ public class CommandLineOptions
     {
       throw new ArgumentException("--json requires --list, --view, --value, --lines or --check.");
     }
+    if (cell is not null && command is not null)
+    {
+      throw new ArgumentException("--cell opens the page, so it cannot be combined with a headless command.");
+    }
     if (documentation is not null &&
-      (root is not null || command is not null || portSpecified || json))
+      (root is not null || command is not null || portSpecified || json || cell is not null))
     {
       throw new ArgumentException("--docs cannot be combined with a book root or another option.");
     }
@@ -226,6 +238,7 @@ public class CommandLineOptions
       Command = command,
       Query = query,
       Lines = lines,
+      Cell = cell,
       Output = output,
       Json = json,
       Documentation = documentation
@@ -236,6 +249,7 @@ public class CommandLineOptions
   {
     writer.WriteLine("usage:");
     writer.WriteLine("  libreta [<book-root>] [--port <n>]   (without --port, the first free port from 5173)");
+    writer.WriteLine("  libreta [<book-root>] --cell <line> <column>   (the page at a cell, by qualified line name)");
     writer.WriteLine("  libreta [<book-root>] --list [--json]");
     writer.WriteLine("  libreta [<book-root>] --view <view-id> [--json]");
     writer.WriteLine("  libreta [<book-root>] --value <view-id> <line> <column> [--json]");
@@ -317,6 +331,23 @@ public static class BookDiscovery
     return !folder.Name.StartsWith('.') &&
       folder.Name is not ("bin" or "obj") &&
       (folder.Attributes & FileAttributes.ReparsePoint) == 0;
+  }
+
+
+}
+
+public static class CellLink
+{
+  /// <summary>The page's query for a cell: the first view in navigation order presenting it, or failing that its
+  /// line, with the cell to select.</summary>
+  public static string Query(string root, string name, string column)
+  {
+    Book book = Book.Load(root);
+    string line = book.Resolve(name, "") ?? throw new ArgumentException($"Unknown line '{name}'.");
+    string view = book.PresentingView(line, column, "") ?? book.PresentingView(line, null, "") ??
+      throw new ArgumentException($"No view presents '{name}'.");
+    return $"/?view={Uri.EscapeDataString(view)}&line={Uri.EscapeDataString(line)}&column=" +
+      Uri.EscapeDataString(column);
   }
 
 

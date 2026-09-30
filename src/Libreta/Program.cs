@@ -75,6 +75,20 @@ else
   root = found[0];
 }
 
+string query = "";
+if (options.Cell is (string cellLine, string cellColumn))
+{
+  try
+  {
+    query = CellLink.Query(root, cellLine, cellColumn);
+  }
+  catch (Exception exception) when (exception is ArgumentException or InvalidDataException)
+  {
+    Console.Error.WriteLine(exception.Message);
+    return 1;
+  }
+}
+
 InstanceRegistry registry = InstanceRegistry.Default;
 if (options.Command == HeadlessCommand.Url)
 {
@@ -139,7 +153,7 @@ if (!watched && registry.Find(root) is ServerInstance existing)
     return 1;
   }
   Console.WriteLine($"  already serving {root} at {existing.Url}");
-  Browser.Open(existing.Url);
+  Browser.Open(existing.Url + query);
   return 0;
 }
 
@@ -247,7 +261,7 @@ try
 {
   if (firstRun)
   {
-    Browser.Open(instance.Url);
+    Browser.Open(instance.Url + query);
   }
   await app.WaitForShutdownAsync();
 }

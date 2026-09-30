@@ -117,7 +117,7 @@ if (options.Command is not null)
 {
   try
   {
-    return HeadlessRunner.Run(root, options.Command.Value, options.Query, options.Json);
+    return HeadlessRunner.Run(root, options.Command.Value, options.Query, options.Json, options.Lines);
   }
   catch (Exception exception)
   {

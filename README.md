@@ -85,6 +85,7 @@ Libreta fixes the engine and the interface, so the agent only writes inputs and 
 For the agent, a CLI:
 
 - `libreta --value` returns any cell's value, its formula, what it reads and what reads it, as JSON.
+- `libreta --lines` returns many lines at once by qualified name, for a tool such as a slide deck quoting the book.
 - `libreta --check` runs every check, such as subtotals matching the printed totals or the balance sheet balancing.
 
 For you, a live page in the browser:

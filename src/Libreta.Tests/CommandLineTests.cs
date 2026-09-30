@@ -124,6 +124,34 @@ public class CommandLineTests
     checkOnly.Command.ShouldBe(HeadlessCommand.Check);
   }
 
+  [Fact]
+  public void ParsesLineNamesUpToTheNextOption()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--lines", "historical.segments.revenue", "dcf.wacc", "--json"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Lines);
+    options.Lines.ShouldBe(["historical.segments.revenue", "dcf.wacc"]);
+    options.Json.ShouldBeTrue();
+  }
+
+  [Fact]
+  public void LinesRequiresAName()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--lines", "--json"];
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+
+    // Assert
+    exception.Message.ShouldBe("--lines requires at least one line name.");
+  }
+
   [Theory]
   [InlineData("--docs", DocumentationTopic.Index)]
   [InlineData("--docs format", DocumentationTopic.Format)]
@@ -649,23 +677,136 @@ public class CommandLineTests
     prior.GetProperty("missing").GetString().ShouldBe("no period before 2024");
   }
 
+  [Fact]
+  public void LinesJsonReadsEachLineByQualifiedNameAcrossItsPeriodsWithoutAView()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.connectivity", "historical.segments.total"], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement[] lines = document.RootElement.EnumerateArray().ToArray();
+    lines.Select(line => line.GetProperty("name").GetString())
+      .ShouldBe(["historical.segments.connectivity", "historical.segments.total"]);
+    JsonElement connectivity = lines[0];
+    connectivity.GetProperty("label").GetString().ShouldBe("Connectivity");
+    connectivity.GetProperty("kind").GetString().ShouldBe("fact");
+    connectivity.GetProperty("units").GetString().ShouldBe("millions");
+    connectivity.GetProperty("columns").EnumerateArray().Select(column => column.GetString())
+      .ShouldBe(["2024", "2025"]);
+    connectivity.GetProperty("exact").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["7.34", "11.5"]);
+    connectivity.GetProperty("display").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["7.3", "11.5"]);
+    JsonElement total = lines[1];
+    total.GetProperty("kind").GetString().ShouldBe("formula");
+    total.GetProperty("exact").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["9.34", "14.5"]);
+    total.TryGetProperty("unresolved", out _).ShouldBeFalse();
+  }
+
+  [Fact]
+  public void LinesReadAContraLineInItsNaturalDirection()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (_, string output) = RunLines(fixture.Root, ["historical.segments.cost"], true);
+
+    // Assert
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement cost = document.RootElement[0];
+    cost.GetProperty("contra").GetBoolean().ShouldBeTrue();
+    cost.GetProperty("exact").EnumerateArray().Select(value => value.GetString()).ShouldBe(["4", "5"]);
+    cost.GetProperty("display").EnumerateArray().Select(value => value.GetString()).ShouldBe(["4.0", "5.0"]);
+  }
+
+  [Fact]
+  public void LinesMarkAnUnresolvedCellWithoutFailing()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(fixture.Root, ["historical.segments.change"], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement change = document.RootElement[0];
+    change.GetProperty("exact")[0].ValueKind.ShouldBe(JsonValueKind.Null);
+    change.GetProperty("display").EnumerateArray().Select(value => value.GetString()).ShouldBe(["—", "5.2"]);
+    change.GetProperty("unresolved").EnumerateArray().Select(value => value.GetBoolean()).ShouldBe([true, false]);
+  }
+
+  [Fact]
+  public void LinesReportAnUnknownNameInPlaceAndExitNonZero()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.missing", "historical.segments.total"], true);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement missing = document.RootElement[0];
+    missing.GetProperty("name").GetString().ShouldBe("historical.segments.missing");
+    missing.GetProperty("error").GetString().ShouldBe("Unknown line 'historical.segments.missing'.");
+    missing.TryGetProperty("exact", out _).ShouldBeFalse();
+    document.RootElement[1].GetProperty("exact").GetArrayLength().ShouldBe(2);
+  }
+
+  [Fact]
+  public void LinesPrintEachLineWithItsDisplayedValues()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.total", "historical.segments.missing"], false);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldBe("""
+      historical.segments.total    2024 9.3, 2025 14.5
+      historical.segments.missing  error: Unknown line 'historical.segments.missing'.
+
+      """.ReplaceLineEndings());
+  }
+
   private static (int ExitCode, string Output) RunCheck(string root, bool json)
   {
     return Run(root, HeadlessCommand.Check, null, json);
+  }
+
+  private static (int ExitCode, string Output) RunLines(string root, List<string> lines, bool json)
+  {
+    return Run(root, HeadlessCommand.Lines, null, json, lines);
   }
 
   private static (int ExitCode, string Output) Run(
     string root,
     HeadlessCommand command,
     ViewQuery? query,
-    bool json)
+    bool json,
+    List<string>? lines = null)
   {
     TextWriter original = Console.Out;
     using var writer = new StringWriter();
     try
     {
       Console.SetOut(writer);
-      int exitCode = HeadlessRunner.Run(root, command, query, json);
+      int exitCode = HeadlessRunner.Run(root, command, query, json, lines);
       return (exitCode, writer.ToString());
     }
     finally
@@ -726,6 +867,47 @@ public class CommandLineTests
         checks:
           sum:
             formula: 1 + 2 - result
+        """);
+    }
+
+
+  }
+
+  /// <summary>Facts and formulas in a folder no view presents, so its lines are reached only by name.</summary>
+  private sealed class LinesBookFixture : TempFolder
+  {
+    public LinesBookFixture()
+    {
+      Write("book.yaml", "name: Lines\nshort_name: Lines\nnavigation: []");
+      Write("formats.yaml", "defaults:\n  unresolved: \"—\"\nformats:\n  millions:\n    decimals: 1");
+      Write("historical/segments/facts/segments.csv", """
+        line_item,2024,2025
+        space,2,3
+        connectivity,7.34,11.5
+        cost,4,5
+        """);
+      Write("historical/segments/facts/segments.yaml", """
+        table:
+          title: Segments
+        defaults:
+          units: millions
+        line_items:
+          space:
+            label: Space
+          connectivity:
+            label: Connectivity
+          cost:
+            label: Cost
+            sign: contra
+        """);
+      Write("historical/segments/formulas.yaml", """
+        formulas:
+          total:
+            formula: space + connectivity
+            units: millions
+          change:
+            formula: total - prior(total)
+            units: millions
         """);
     }
 

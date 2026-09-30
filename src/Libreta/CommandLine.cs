@@ -155,10 +155,6 @@ public class CommandLineOptions
           RequireNoCommand(command, argument);
           command = HeadlessCommand.Lines;
           lines = arguments.Skip(index + 1).TakeWhile(name => !name.StartsWith('-')).ToList();
-          if (lines.Count == 0)
-          {
-            throw new ArgumentException("--lines requires at least one line name.");
-          }
           index += lines.Count;
           break;
         case "--check":
@@ -243,7 +239,7 @@ public class CommandLineOptions
     writer.WriteLine("  libreta [<book-root>] --list [--json]");
     writer.WriteLine("  libreta [<book-root>] --view <view-id> [--json]");
     writer.WriteLine("  libreta [<book-root>] --value <view-id> <line> <column> [--json]");
-    writer.WriteLine("  libreta [<book-root>] --lines <line>... [--json]   (lines by qualified name, all periods)");
+    writer.WriteLine("  libreta [<book-root>] --lines [<line>...] [--json]   (lines by qualified name, or every line)");
     writer.WriteLine("  libreta [<book-root>] --check [--json]");
     writer.WriteLine("  libreta [<book-root>] --export <file.html>   (the whole book as one self-contained page)");
     writer.WriteLine("  libreta [<book-root>] --export <file.xlsx>   (the whole book as a workbook, a sheet per view)");
@@ -368,20 +364,24 @@ public static class HeadlessRunner
     return 0;
   }
 
-  /// <summary>Loads the book once for every line, so a caller reading many pays one start. Exits non-zero only when a
-  /// name is unknown or fails to evaluate; a cell with no value is marked, not a failure.</summary>
+  /// <summary>Loads the book once for every line, so a caller reading many pays one start, and reads every line in the
+  /// book when no name is given. Exits non-zero only when a name is unknown or fails to evaluate; a cell with no value
+  /// is marked, not a failure.</summary>
   private static int RunLines(string root, IReadOnlyList<string> names, bool json)
   {
     Book book = Book.Load(root);
     var views = new Dictionary<string, (View View, Engine Engine)>();
-    List<LinePayload> lines = names.Select(name => ReadLine(book, views, name)).ToList();
+    IEnumerable<string> asked = names.Count > 0
+      ? names
+      : book.Facts.Keys.Concat(book.Formulas.Keys).Distinct().Order(StringComparer.Ordinal);
+    List<LinePayload> lines = asked.Select(name => ReadLine(book, views, name)).ToList();
     if (json)
     {
       Console.WriteLine(JsonSerializer.Serialize(lines, JsonOptions));
     }
     else
     {
-      int width = lines.Max(line => line.Name.Length);
+      int width = lines.Select(line => line.Name.Length).DefaultIfEmpty().Max();
       foreach (LinePayload line in lines)
       {
         string values = line.Error is not null

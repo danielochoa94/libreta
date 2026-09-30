@@ -140,16 +140,18 @@ public class CommandLineTests
   }
 
   [Fact]
-  public void LinesRequiresAName()
+  public void ParsesLinesWithNoNames()
   {
     // Arrange
     string[] arguments = ["books/spacex", "--lines", "--json"];
 
     // Act
-    ArgumentException exception = Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
 
     // Assert
-    exception.Message.ShouldBe("--lines requires at least one line name.");
+    options.Command.ShouldBe(HeadlessCommand.Lines);
+    options.Lines.ShouldBeEmpty();
+    options.Json.ShouldBeTrue();
   }
 
   [Theory]
@@ -763,6 +765,23 @@ public class CommandLineTests
     missing.GetProperty("error").GetString().ShouldBe("Unknown line 'historical.segments.missing'.");
     missing.TryGetProperty("exact", out _).ShouldBeFalse();
     document.RootElement[1].GetProperty("exact").GetArrayLength().ShouldBe(2);
+  }
+
+  [Fact]
+  public void LinesWithNoNamesReadEveryLineInOrderOfName()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(fixture.Root, [], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    document.RootElement.EnumerateArray().Select(line => line.GetProperty("name").GetString()).ShouldBe(
+      ["historical.segments.change", "historical.segments.connectivity", "historical.segments.cost",
+        "historical.segments.space", "historical.segments.total"]);
   }
 
   [Fact]

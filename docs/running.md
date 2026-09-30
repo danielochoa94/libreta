@@ -92,6 +92,8 @@ Print several lines by qualified name, each over every period its folder has, wh
 libreta books/spacex --lines historical.segments.connectivity_revenue historical.segments.connectivity_share_of_revenue
 ```
 
+Leave the names out to print every line in the book, in order of qualified name.
+
 Add `--json` to any headless command for structured output:
 
 ```bash
@@ -106,7 +108,7 @@ The value form includes the resolved line and column, exact and displayed values
 An input this view does not show carries its own formula, calculation and inputs; one that a `prior()` reaches past the first period carries `missing` instead of a column.
 `--value` addresses the underlying line and column even when the view is transposed, and fails if the cell is unresolved or is not presented by that view.
 With `--json`, an unresolved cell still prints before the nonzero exit, so its inputs show what is missing.
-The lines form loads the book once for all the names, so a tool quoting many figures pays one start rather than one per figure.
+The lines form loads the book once for all the names, so a tool quoting many figures pays one start rather than one per figure, and one that doesn't know which it needs yet reads every line.
 It returns each line's label, kind, units, columns, and exact and displayed values in the order asked, formatted by the `formats.yaml` nearest its folder.
 Values keep their natural direction, and a line views show negated carries `contra`.
 A cell with no value is marked in `unresolved` without failing; an unknown name carries an `error` in its place, and the command exits nonzero once every line has printed.

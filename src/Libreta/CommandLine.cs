@@ -18,6 +18,8 @@ public record ViewTableRowPayload
   public List<string?>? Exact { get; init; }
   public List<string>? Display { get; init; }
   public List<bool>? Unresolved { get; init; }
+  /// <summary>Per cell, whether the view shows it negated; <c>Exact</c> stays in natural direction.</summary>
+  public List<bool>? Contra { get; init; }
 }
 
 public record ViewTablePayload(
@@ -761,7 +763,8 @@ public static class ViewTablePayloadBuilder
       Display = hasCells ? row.Cells.Select(cell => cell.Display).ToList() : null,
       Unresolved = row.Cells.Any(cell => cell.Unresolved)
         ? row.Cells.Select(cell => cell.Unresolved).ToList()
-        : null
+        : null,
+      Contra = row.Cells.Any(cell => cell.Contra) ? row.Cells.Select(cell => cell.Contra).ToList() : null
     };
   }
 

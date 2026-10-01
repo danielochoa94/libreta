@@ -597,6 +597,39 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void ViewJsonMarksContraCellsWhoseExactValuesKeepTheirNaturalDirection()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new("""
+      formulas:
+        result:
+          formula: 7
+          units: millions
+      """, """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+          sign: contra
+      """);
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.View, new ViewQuery("v"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement row = document.RootElement.GetProperty("rows")[0];
+    row.GetProperty("exact").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "7", "7" });
+    row.GetProperty("display").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "(7.00)", "(7.00)" });
+    row.GetProperty("contra").EnumerateArray()
+      .Select(value => value.GetBoolean()).ShouldBe(new[] { true, true });
+  }
+
+  [Fact]
   public void ValueJsonSerializesADeepCalculation()
   {
     // Arrange

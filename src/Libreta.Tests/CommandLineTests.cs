@@ -627,6 +627,59 @@ public class CommandLineTests
       .Select(value => value.GetString()).ShouldBe(new[] { "(7.00)", "(7.00)" });
     row.GetProperty("contra").EnumerateArray()
       .Select(value => value.GetBoolean()).ShouldBe(new[] { true, true });
+    row.TryGetProperty("cells", out _).ShouldBeFalse();
+  }
+
+  [Fact]
+  public void ViewJsonNamesEachCellWhereItsRowAndColumnDoNot()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    (int exitCode, string output) = Run(fixture.Root, HeadlessCommand.View, new ViewQuery("comps"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement rows = document.RootElement.GetProperty("rows");
+    Cells(rows[0]).ShouldBe(new[]
+    {
+      ("alpha::metrics.revenue", "2025"), ("alpha::metrics.doubled", "alpha::metrics.double")
+    });
+    Cells(rows[3]).ShouldBe(new[]
+    {
+      ("comps.median.metrics.revenue", "2025"), ("comps.median.metrics.doubled", "double")
+    });
+  }
+
+  [Fact]
+  public void ACellLinkOpensACellOfAComparedBook()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "beta::metrics.doubled", "beta::metrics.double");
+
+    // Assert
+    query.ShouldBe("/?view=comps&line=beta%3A%3Ametrics.doubled&column=beta%3A%3Ametrics.double");
+  }
+
+  [Fact]
+  public void ACellLinkOpensACellOfAComparisonSummary()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "comps.median.metrics.revenue", "2025");
+
+    // Assert
+    query.ShouldBe("/?view=comps&line=comps.median.metrics.revenue&column=2025");
   }
 
   [Fact]
@@ -921,6 +974,38 @@ public class CommandLineTests
     {
       Console.SetOut(original);
     }
+  }
+
+  private static void WriteComparisonWithMedian(ViewFixture fixture)
+  {
+    fixture.WriteComparison();
+    fixture.Write("comps/median/metrics/formulas.yaml", """
+      formulas:
+        revenue:
+          formula: median(alpha::metrics.revenue["2025"], beta::metrics.revenue["2025"])
+        doubled:
+          formula: median(alpha::metrics.doubled["double"], beta::metrics.doubled["double"])
+      """);
+    fixture.Write("comps/view.yaml", """
+      title: Comparison
+      rows:
+        - book: alpha
+        - book: beta
+        - space: compact
+        - scope: median
+      columns:
+        - line: metrics.revenue
+          column: "2025"
+        - line: metrics.doubled
+          column: double
+      """);
+  }
+
+  private static (string Line, string Column)[] Cells(JsonElement row)
+  {
+    return row.GetProperty("cells").EnumerateArray()
+      .Select(cell => (cell.GetProperty("line").GetString()!, cell.GetProperty("column").GetString()!))
+      .ToArray();
   }
 
 

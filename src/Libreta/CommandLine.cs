@@ -7,6 +7,8 @@ public record ViewQuery(string ViewId, string? Line = null, string? Column = nul
 
 public record ViewTableColumnPayload(string Name, string Label);
 
+public record ViewTableCellPayload(string Line, string Column);
+
 public record ViewTableRowPayload
 {
   public string? Name { get; init; }
@@ -20,6 +22,9 @@ public record ViewTableRowPayload
   public List<bool>? Unresolved { get; init; }
   /// <summary>Per cell, whether the view shows it negated; <c>Exact</c> stays in natural direction.</summary>
   public List<bool>? Contra { get; init; }
+  /// <summary>Per cell, the book cell it shows, given only when one isn't the row's line in its column's period, as
+  /// in a comparison, whose rows are books, or a transposed view.</summary>
+  public List<ViewTableCellPayload>? Cells { get; init; }
 }
 
 public record ViewTablePayload(
@@ -737,7 +742,7 @@ public static class ViewTablePayloadBuilder
     List<ViewTableColumnPayload> columns = payload.Columns
       .Select(column => new ViewTableColumnPayload(column.Name, column.Label))
       .ToList();
-    List<ViewTableRowPayload> rows = payload.Rows.Select(Row).ToList();
+    List<ViewTableRowPayload> rows = payload.Rows.Select(row => Row(row, columns)).ToList();
     return new ViewTablePayload(
       id,
       payload.Title,
@@ -748,9 +753,11 @@ public static class ViewTablePayloadBuilder
       payload.Sensitivities);
   }
 
-  private static ViewTableRowPayload Row(RowPayload row)
+  private static ViewTableRowPayload Row(RowPayload row, List<ViewTableColumnPayload> columns)
   {
     bool hasCells = row.Cells.Count > 0;
+    bool elsewhere = row.Cells.Where((cell, index) => cell.Line != row.Name || cell.Column != columns[index].Name)
+      .Any();
     return new ViewTableRowPayload
     {
       Name = Present(row.Name),
@@ -764,7 +771,8 @@ public static class ViewTablePayloadBuilder
       Unresolved = row.Cells.Any(cell => cell.Unresolved)
         ? row.Cells.Select(cell => cell.Unresolved).ToList()
         : null,
-      Contra = row.Cells.Any(cell => cell.Contra) ? row.Cells.Select(cell => cell.Contra).ToList() : null
+      Contra = row.Cells.Any(cell => cell.Contra) ? row.Cells.Select(cell => cell.Contra).ToList() : null,
+      Cells = elsewhere ? row.Cells.Select(cell => new ViewTableCellPayload(cell.Line, cell.Column)).ToList() : null
     };
   }
 

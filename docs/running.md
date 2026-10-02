@@ -112,6 +112,7 @@ libreta books/spacex --lines historical.segments.connectivity_revenue --json
 ```
 
 The view form returns the table's columns, rows, exact and displayed values, checks and sensitivities; formula graphs and sources are left out, so use `--value` for those.
+A row whose cells aren't its line in its columns' periods, as in a comparison or a transposed view, names each cell's line and column in `cells`, which `--cell` opens.
 The value form includes the resolved line and column, exact and displayed values, units, formula, note and source, the calculation written out with displayed values, the cells it reads as `inputs`, and the cells that read it as `dependents`.
 An input this view does not show carries its own formula, calculation and inputs; one that a `prior()` reaches past the first period carries `missing` instead of a column.
 `--value` addresses the underlying line and column even when the view is transposed, and fails if the cell is unresolved or is not presented by that view.

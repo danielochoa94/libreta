@@ -1,5 +1,6 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Libreta;
 
@@ -343,18 +344,30 @@ public static class BookDiscovery
 
 }
 
+public record RequestedCell(string View, string Line, string Column)
+{
+  [JsonIgnore]
+  public string Query => $"/?view={Uri.EscapeDataString(View)}&line={Uri.EscapeDataString(Line)}&column=" +
+    Uri.EscapeDataString(Column);
+}
+
+public record CellAnswer(string Query, int Pages);
+
 public static class CellLink
 {
   /// <summary>The page's query for a cell: the first view in navigation order presenting it, or failing that its
   /// line, with the cell to select.</summary>
   public static string Query(string root, string name, string column)
   {
-    Book book = Book.Load(root);
+    return Resolve(Book.Load(root), name, column).Query;
+  }
+
+  public static RequestedCell Resolve(Book book, string name, string column)
+  {
     string line = book.Resolve(name, "") ?? throw new ArgumentException($"Unknown line '{name}'.");
     string view = book.PresentingView(line, column, "") ?? book.PresentingView(line, null, "") ??
       throw new ArgumentException($"No view presents '{name}'.");
-    return $"/?view={Uri.EscapeDataString(view)}&line={Uri.EscapeDataString(line)}&column=" +
-      Uri.EscapeDataString(column);
+    return new RequestedCell(view, line, column);
   }
 
 

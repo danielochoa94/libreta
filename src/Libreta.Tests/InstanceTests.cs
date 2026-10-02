@@ -118,6 +118,54 @@ public class InstanceTests
     stopped.Wait(Grace * 4).ShouldBeFalse();
   }
 
+  [Fact]
+  public void CountsThePagesHoldingTheStreamOpen()
+  {
+    // Arrange
+    var pages = new Pages();
+    IDisposable first = pages.Connect();
+    using IDisposable second = pages.Connect();
+
+    // Act
+    first.Dispose();
+    first.Dispose();
+
+    // Assert
+    pages.Count.ShouldBe(1);
+  }
+
+  [Fact]
+  public void PassesTheLatestRequestedCellOnToAPageOnce()
+  {
+    // Arrange
+    var pages = new Pages();
+    long seen = pages.Version;
+    pages.Request(new RequestedCell("statement", "statement.revenue", "2024"));
+    pages.Request(new RequestedCell("statement", "statement.revenue", "2025"));
+
+    // Act
+    RequestedCell? first = pages.Since(ref seen);
+    RequestedCell? second = pages.Since(ref seen);
+
+    // Assert
+    first.ShouldBe(new RequestedCell("statement", "statement.revenue", "2025"));
+    second.ShouldBeNull();
+  }
+
+  [Fact]
+  public void APageConnectingLaterMissesEarlierRequests()
+  {
+    // Arrange
+    var pages = new Pages();
+    pages.Request(new RequestedCell("statement", "statement.revenue", "2025"));
+
+    // Act
+    long seen = pages.Version;
+
+    // Assert
+    pages.Since(ref seen).ShouldBeNull();
+  }
+
   private static TcpListener Listen()
   {
     var listener = new TcpListener(IPAddress.Loopback, 0);

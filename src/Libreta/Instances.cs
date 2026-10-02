@@ -213,6 +213,95 @@ public class Viewers : IDisposable
 
 }
 
+/// <summary>The pages holding the event stream open, and the latest cell a tool asked them to select, so a tool
+/// tracing numbers into an open page moves its selection rather than opening a tab per number.</summary>
+public class Pages
+{
+  private readonly object gate = new object();
+  private int count;
+  private long version;
+  private RequestedCell? latest;
+
+  public int Count
+  {
+    get
+    {
+      lock (gate)
+      {
+        return count;
+      }
+    }
+  }
+
+  public long Version
+  {
+    get
+    {
+      lock (gate)
+      {
+        return version;
+      }
+    }
+  }
+
+  public IDisposable Connect()
+  {
+    lock (gate)
+    {
+      count++;
+    }
+    return new Connection(this);
+  }
+
+  public void Request(RequestedCell cell)
+  {
+    lock (gate)
+    {
+      latest = cell;
+      version++;
+    }
+  }
+
+  /// <summary>The cell requested since <paramref name="seen"/>, if any, moving it to the latest request.</summary>
+  public RequestedCell? Since(ref long seen)
+  {
+    lock (gate)
+    {
+      if (seen == version)
+      {
+        return null;
+      }
+      seen = version;
+      return latest;
+    }
+  }
+
+  private void Disconnect()
+  {
+    lock (gate)
+    {
+      count--;
+    }
+  }
+
+  private class Connection(Pages pages) : IDisposable
+  {
+    private int disposed;
+
+    public void Dispose()
+    {
+      if (Interlocked.Exchange(ref disposed, 1) == 0)
+      {
+        pages.Disconnect();
+      }
+    }
+
+
+  }
+
+
+}
+
 public static class Browser
 {
   public static void Open(string url)

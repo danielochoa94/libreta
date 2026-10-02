@@ -181,6 +181,21 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void ACellLinkResolvesInABookAlreadyLoaded()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+    Book book = Book.Load(fixture.Root);
+
+    // Act
+    RequestedCell cell = CellLink.Resolve(book, "statement.gross_profit", "2025");
+
+    // Assert
+    cell.ShouldBe(new RequestedCell("statement", "statement.gross_profit", "2025"));
+  }
+
+  [Fact]
   public void ACellLinkToAnUnknownLineFails()
   {
     // Arrange

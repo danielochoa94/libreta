@@ -75,20 +75,6 @@ else
   root = found[0];
 }
 
-string query = "";
-if (options.Cell is (string cellLine, string cellColumn))
-{
-  try
-  {
-    query = CellLink.Query(root, cellLine, cellColumn);
-  }
-  catch (Exception exception) when (exception is ArgumentException or InvalidDataException)
-  {
-    Console.Error.WriteLine(exception.Message);
-    return 1;
-  }
-}
-
 InstanceRegistry registry = InstanceRegistry.Default;
 if (options.Command == HeadlessCommand.Url)
 {
@@ -152,9 +138,27 @@ if (!watched && registry.Find(root) is ServerInstance existing)
     Console.Error.WriteLine($"{root} is already served at {existing.Url}.");
     return 1;
   }
+  if (options.Cell is (string line, string column))
+  {
+    return await SelectCell(existing, root, line, column);
+  }
   Console.WriteLine($"  already serving {root} at {existing.Url}");
-  Browser.Open(existing.Url + query);
+  Browser.Open(existing.Url);
   return 0;
+}
+
+string query = "";
+if (options.Cell is (string cellLine, string cellColumn))
+{
+  try
+  {
+    query = CellLink.Query(root, cellLine, cellColumn);
+  }
+  catch (Exception exception) when (exception is ArgumentException or InvalidDataException)
+  {
+    Console.Error.WriteLine(exception.Message);
+    return 1;
+  }
 }
 
 string assets = InterfaceFolder();
@@ -182,6 +186,7 @@ using var viewers = new Viewers(TimeSpan.FromSeconds(10), () =>
   Console.WriteLine($"  stopped   {DateTime.Now:HH:mm:ss}  no page open");
   app.Lifetime.StopApplication();
 });
+var pages = new Pages();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -222,13 +227,39 @@ app.MapGet("/api/export/{format}", (string format) =>
   }
 });
 
-// The page holds this open and re-fetches whenever the book changes on disk.
+// A tool tracing a number asks here first, so an open page selects it, and only a book with no page open gets a tab.
+app.MapPost("/api/cell", (string line, string column) =>
+{
+  if (store.Book is not Book book)
+  {
+    return Results.Text(store.Catalog.Error ?? "the book has not loaded", "text/plain",
+      statusCode: StatusCodes.Status503ServiceUnavailable);
+  }
+  try
+  {
+    RequestedCell cell = CellLink.Resolve(book, line, column);
+    int open = pages.Count;
+    if (open > 0)
+    {
+      pages.Request(cell);
+    }
+    return Results.Json(new CellAnswer(cell.Query, open), jsonOptions);
+  }
+  catch (ArgumentException exception)
+  {
+    return Results.Text(exception.Message, "text/plain", statusCode: StatusCodes.Status404NotFound);
+  }
+});
+
+// The page holds this open, re-fetches whenever the book changes on disk, and selects each cell a tool requests.
 app.MapGet("/api/events", async (HttpContext context, CancellationToken cancellation) =>
 {
   context.Response.Headers.ContentType = "text/event-stream";
   context.Response.Headers.CacheControl = "no-cache";
   using IDisposable? viewer = watched ? null : viewers.Connect();
+  using IDisposable page = pages.Connect();
   long seen = store.Version;
+  long seenCell = pages.Version;
   long seenAssets = store.AssetVersion;
   await context.Response.WriteAsync($"data: {seen}\n\n", cancellation);
   await context.Response.Body.FlushAsync(cancellation);
@@ -238,6 +269,12 @@ app.MapGet("/api/events", async (HttpContext context, CancellationToken cancella
     {
       seenAssets = store.AssetVersion;
       await context.Response.WriteAsync($"event: assets\ndata: {seenAssets}\n\n", cancellation);
+      await context.Response.Body.FlushAsync(cancellation);
+    }
+    if (pages.Since(ref seenCell) is RequestedCell cell)
+    {
+      await context.Response.WriteAsync($"event: cell\ndata: {JsonSerializer.Serialize(cell, jsonOptions)}\n\n",
+        cancellation);
       await context.Response.Body.FlushAsync(cancellation);
     }
     if (store.Version != seen)
@@ -274,6 +311,44 @@ return 0;
 static TextWriter Utf8Writer(Stream stream)
 {
   return TextWriter.Synchronized(new StreamWriter(stream, new UTF8Encoding(false)) { AutoFlush = true });
+}
+
+/// <summary>Has the server's open page select a cell, or opens a tab at it when none is open. A server older than
+/// the request gets a tab regardless.</summary>
+static async Task<int> SelectCell(ServerInstance server, string root, string line, string column)
+{
+  using var client = new HttpClient();
+  string url = $"{server.Url}/api/cell?line={Uri.EscapeDataString(line)}&column={Uri.EscapeDataString(column)}";
+  using HttpResponseMessage response = await client.PostAsync(url, null);
+  string body = await response.Content.ReadAsStringAsync();
+  if (response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.MethodNotAllowed && body.Length == 0)
+  {
+    try
+    {
+      Browser.Open(server.Url + CellLink.Query(root, line, column));
+      return 0;
+    }
+    catch (Exception exception) when (exception is ArgumentException or InvalidDataException)
+    {
+      Console.Error.WriteLine(exception.Message);
+      return 1;
+    }
+  }
+  if (!response.IsSuccessStatusCode)
+  {
+    Console.Error.WriteLine(body);
+    return 1;
+  }
+  CellAnswer answer = JsonSerializer.Deserialize<CellAnswer>(body, PayloadJson.Options)!;
+  if (answer.Pages == 0)
+  {
+    Browser.Open(server.Url + answer.Query);
+  }
+  else
+  {
+    Console.WriteLine($"  selected {line} in {column} on the page at {server.Url}");
+  }
+  return 0;
 }
 
 /// <summary>An explicit port fails if taken; a default steps upward. Releasing the probe before Kestrel binds is a
@@ -341,7 +416,8 @@ public class BookStore : IDisposable
   private BookSnapshot snapshot = new BookSnapshot(
     new ViewCatalog("", "", new List<ViewCatalogEntry>(), 0),
     new Dictionary<string, ViewPayload>(),
-    new HashSet<string>());
+    new HashSet<string>(),
+    null);
   private long version;
   private long assetVersion;
   private bool disposed;
@@ -367,6 +443,9 @@ public class BookStore : IDisposable
   }
 
   public ViewCatalog Catalog => Volatile.Read(ref snapshot).Catalog;
+
+  /// <summary>The last book that loaded, kept through a load that fails.</summary>
+  public Book? Book => Volatile.Read(ref snapshot).Book;
 
   public bool TryGetView(string id, out ViewPayload? payload)
   {
@@ -610,7 +689,7 @@ public class BookStore : IDisposable
         }
       }
       HashSet<string> sourceImages = SourceImages(book);
-      Volatile.Write(ref snapshot, new BookSnapshot(catalog, views, sourceImages));
+      Volatile.Write(ref snapshot, new BookSnapshot(catalog, views, sourceImages, book));
       Interlocked.Exchange(ref version, next);
       Console.WriteLine($"  reloaded  {DateTime.Now:HH:mm:ss}  {views.Count} views");
     }
@@ -619,7 +698,8 @@ public class BookStore : IDisposable
   private record BookSnapshot(
     ViewCatalog Catalog,
     IReadOnlyDictionary<string, ViewPayload> Views,
-    IReadOnlySet<string> SourceImages);
+    IReadOnlySet<string> SourceImages,
+    Book? Book);
 
 
 }

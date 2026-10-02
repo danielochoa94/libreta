@@ -2647,6 +2647,11 @@ function connect() {
     refresh();
   };
   source.addEventListener('assets', () => location.reload());
+  source.addEventListener('cell', (event) => {
+    const { view, line, column } = JSON.parse(event.data);
+    followReference(view, line, column);
+    window.focus();
+  });
   source.onerror = () => {
     el('dot').className = 'status-indicator down';
     el('status').textContent = 'Disconnected';

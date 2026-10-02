@@ -40,6 +40,8 @@ libreta books/spacex --cell historical.segments.connectivity_revenue 2025
 ```
 
 The page shows the first view in navigation order that presents the cell, or failing that the line; a tool linking to the book, such as a slide deck tracing a number, runs this.
+When a server already runs the book with a page open, that page selects the cell instead of a new tab opening.
+Browsers keep a page from bringing its own tab forward, so a page in a background tab selects the cell there.
 
 The server stops about ten seconds after its last tab closes, long enough for a reload to reconnect.
 It keeps running until a first tab connects, and `Ctrl+C` stops it at any time.

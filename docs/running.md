@@ -140,7 +140,8 @@ The report lists results by view and ends with totals for passed checks, failed 
 Failed checks include their per-period deltas.
 
 A presented row that resolves to neither a fact nor a formula is reported as a missing line.
-The command exits 1 if a check fails, a view fails to load, a presented calculation is invalid, or a line is missing.
+A formula whose every reference names its column, in a folder of several columns, is reported as a repeated line: it shows the same value in each, and belongs in a [folder of one column](format.md#single-values).
+The command exits 1 if a check fails, a view fails to load, a presented calculation is invalid, or a line is missing; a repeated line is only reported.
 
 ## Share a book as one page
 

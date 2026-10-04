@@ -4,6 +4,39 @@ namespace Libreta;
 
 public abstract class Expr
 {
+  /// <summary>Whether every reference names its column, so the expression has one value whatever column it is in.
+  /// </summary>
+  public static bool Pinned(Expr expression)
+  {
+    bool any = false;
+    bool Walk(Expr node)
+    {
+      switch (node)
+      {
+        case RefExpr reference:
+          any = true;
+          return reference.Column is not null;
+        case RangeExpr:
+          any = true;
+          return true;
+        case PriorExpr prior:
+          return Walk(prior.Inner);
+        case UnaryExpr unary:
+          return Walk(unary.Operand);
+        case BinaryExpr binary:
+          return Walk(binary.Left) && Walk(binary.Right);
+        case ComparisonExpr comparison:
+          return Walk(comparison.Left) && Walk(comparison.Right);
+        case FunctionExpr function:
+          return function.Arguments.All(Walk);
+        default:
+          return true;
+      }
+    }
+    return Walk(expression) && any;
+  }
+
+
 }
 
 public sealed class NumberExpr : Expr

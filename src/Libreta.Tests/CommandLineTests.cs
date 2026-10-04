@@ -519,6 +519,41 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void CheckWarnsOfAFormulaPinnedToOneColumnInAScopeOfSeveral()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(
+      """
+      formulas:
+        result:
+          formula: input["2025"] / input["2024"] - 1
+        growth:
+          formula: input / prior(input) - 1
+        total:
+          formula: sum(input["2024":"2025"])
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+        - line: growth
+        - line: total
+      """,
+      "line_item,2024,2025\ninput,1,2");
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldContain("repeated line: v.result, the same in every column");
+    output.ShouldContain("repeated line: v.total, the same in every column");
+    output.ShouldNotContain("repeated line: v.growth");
+    output.ShouldContain("2 repeated lines");
+  }
+
+  [Fact]
   public void CheckRunsEachExplicitCheckOnce()
   {
     // Arrange

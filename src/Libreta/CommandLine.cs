@@ -549,6 +549,12 @@ public static class HeadlessRunner
     int failed = checkedViews.Sum(view => view.Checks.Count(check => !check.Passed));
     int errors = checkedViews.Count(view => view.Error is not null);
     int missingLines = checkedViews.Sum(view => view.Missing.Count);
+    // A formula pinned to one column repeats its value under every column of its scope.
+    List<string> repeated = book.Formulas.Values
+      .Where(formula => Expr.Pinned(formula.Expression) && book.PeriodsFor(formula.Scope).Count > 1)
+      .Select(formula => formula.Name)
+      .Order(StringComparer.Ordinal)
+      .ToList();
     bool ok = failed == 0 && errors == 0 && missingLines == 0;
 
     if (json)
@@ -561,7 +567,8 @@ public static class HeadlessRunner
           Failed = failed,
           Errors = errors,
           MissingLines = missingLines,
-          Views = checkedViews
+          Views = checkedViews,
+          Repeated = repeated
         },
         JsonOptions));
       return ok ? 0 : 1;
@@ -580,9 +587,14 @@ public static class HeadlessRunner
         Console.WriteLine($"    missing line: {line}");
       }
     }
+    foreach (string line in repeated)
+    {
+      Console.WriteLine($"repeated line: {line}, the same in every column; move it to a folder of one column");
+    }
     Console.WriteLine();
     Console.WriteLine($"{passed + failed} checks in {checkedViews.Count} views: {passed} passed, {failed} failed, " +
-      $"{errors} {Plural(errors, "view")} in error, {missingLines} missing {Plural(missingLines, "line")}");
+      $"{errors} {Plural(errors, "view")} in error, {missingLines} missing {Plural(missingLines, "line")}" +
+      (repeated.Count == 0 ? "" : $", {repeated.Count} repeated {Plural(repeated.Count, "line")}"));
     return ok ? 0 : 1;
   }
 

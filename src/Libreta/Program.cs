@@ -197,7 +197,12 @@ if (options.NoOpen && !watched)
 var pages = new Pages();
 
 app.UseDefaultFiles();
-app.UseStaticFiles();
+// The page is served from source, and without a Cache-Control a browser reuses a script it judges fresh, running an
+// edited file's old version.
+app.UseStaticFiles(new StaticFileOptions
+{
+  OnPrepareResponse = file => file.Context.Response.Headers.CacheControl = "no-cache"
+});
 
 JsonSerializerOptions jsonOptions = PayloadJson.Options;
 app.MapGet("/api/catalog", () => Results.Text(

@@ -30,8 +30,8 @@ class RequestCoordinator {
 
 // An exported page carries the catalog, every view and the source images in place of the server.
 const snapshot = readSnapshot();
-// A page showing the export in a frame, such as a slide deck tracing a number, starts it on the table alone.
-const embedded = Boolean(snapshot) && window.parent !== window;
+// A page in a frame, such as a slide deck tracing a number, starts on the table alone, live or exported.
+const embedded = window.parent !== window;
 const el = (id) => document.getElementById(id);
 // Held by reference: render() rebuilds the header row and re-appends it.
 const labelResizer = el('label-resizer');
@@ -2670,7 +2670,8 @@ function connect() {
   source.addEventListener('cell', (event) => {
     const { view, line, column } = JSON.parse(event.data);
     followReference(view, line, column);
-    window.focus();
+    // A frame may be hidden over a page that keeps its keys, so only a page of its own takes focus.
+    if (!embedded) window.focus();
   });
   source.onerror = () => {
     el('dot').className = 'status-indicator down';

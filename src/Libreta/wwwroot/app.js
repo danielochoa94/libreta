@@ -479,14 +479,14 @@ async function openView(id, replace = false, restored = null) {
 }
 
 // A followed reference is a step back undoes, even when it stays in the same view.
-async function followReference(view, line, column) {
+async function followReference(view, line, column, replace = false) {
   if (view && view !== activeView) {
-    await openView(view);
+    await openView(view, replace);
     return openCoordinate(line, column);
   }
   if (locate(line, column || null) === null) return false;
-  rememberHistoryEntry();
-  updateUrl(activeView, false);
+  if (!replace) rememberHistoryEntry();
+  updateUrl(activeView, replace);
   return openCoordinate(line, column);
 }
 
@@ -2669,7 +2669,8 @@ function connect() {
   source.addEventListener('assets', () => location.reload());
   source.addEventListener('cell', (event) => {
     const { view, line, column } = JSON.parse(event.data);
-    followReference(view, line, column);
+    // A frame's history is its page's too, where back should close the frame rather than step through cells sent to it.
+    followReference(view, line, column, embedded);
     // A frame may be hidden over a page that keeps its keys, so only a page of its own takes focus.
     if (!embedded) window.focus();
   });

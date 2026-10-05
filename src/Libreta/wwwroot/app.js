@@ -2538,6 +2538,12 @@ function isTypingTarget(target) {
     || target instanceof HTMLSelectElement || target.isContentEditable;
 }
 
+// A page showing an export in a frame, such as a slide deck tracing a number, takes Escape back unless a dialog or
+// menu claims it; the selected cell is what that page opened the book at, so clearing it is no reason to stay.
+function leavesEmbeddedBook(event, overlayOpen) {
+  return event.key === 'Escape' && !overlayOpen && !event.ctrlKey && !event.metaKey && !event.altKey;
+}
+
 function handleGlobalKeydown(event) {
   if (event.defaultPrevented || isTypingTarget(event.target)) return;
   if (el('shortcuts-dialog').open || el('source-image-dialog').open) return;
@@ -2766,6 +2772,13 @@ window.addEventListener('resize', () => {
   if (el('source-image-dialog').open) sizeSourceImageToFit();
 });
 document.addEventListener('keydown', handleGlobalKeydown);
+if (snapshot && window.parent !== window) {
+  document.addEventListener('keydown', (event) => {
+    const overlayOpen = el('shortcuts-dialog').open || el('source-image-dialog').open ||
+      el('export-menu').matches(':popover-open');
+    if (leavesEmbeddedBook(event, overlayOpen)) window.parent.postMessage({ libreta: 'escape' }, '*');
+  }, true);
+}
 document.addEventListener('click', restoreGridFocusAfterClick);
 
 setupTooltips();

@@ -498,12 +498,24 @@ function clearViewState() {
 
 function requestedView() {
   const url = new URL(location.href);
-  return snapshot ? new URLSearchParams(url.hash.slice(1)).get('view') : url.searchParams.get('view');
+  if (!snapshot) return url.searchParams.get('view');
+  return snapshotCell(url.hash, snapshot.lines)?.view ?? new URLSearchParams(url.hash.slice(1)).get('view');
 }
 
-// A tool opening the book at a cell names it once in the query, and a reload keeps only the view.
+// A page linking into an export names a cell in the fragment, which has no server to ask which view presents it.
+function snapshotCell(hash, lines) {
+  const params = new URLSearchParams(hash.slice(1));
+  const name = params.get('line');
+  if (!name) return null;
+  const line = name.replaceAll('/', '.').replaceAll('-', '_');
+  const column = params.get('column');
+  const presented = lines?.[line];
+  return { view: params.get('view') ?? presented?.columns?.[column] ?? presented?.view ?? null, line, column };
+}
+
+// A tool opening the book at a cell names it once in the URL, and a reload keeps only the view.
 function takeRequestedCell() {
-  if (snapshot) return null;
+  if (snapshot) return snapshotCell(location.hash, snapshot.lines);
   const url = new URL(location.href);
   const line = url.searchParams.get('line');
   if (!line) return null;
@@ -2658,11 +2670,19 @@ function connect() {
   };
 }
 
-window.addEventListener('popstate', (event) => {
+window.addEventListener('popstate', async (event) => {
   rememberHistoryEntry();
   historyEntry = event.state?.entry ?? newHistoryEntry();
   const id = requestedView();
-  if (knownView(id)) openView(id, true, savedViewState(id));
+  if (!knownView(id)) return;
+  const cell = snapshot ? takeRequestedCell() : null;
+  if (!cell) {
+    openView(id, true, savedViewState(id));
+    return;
+  }
+  await openView(id, true);
+  updateUrl(activeView, true);
+  openCoordinate(cell.line, cell.column);
 });
 window.addEventListener('pagehide', persistHistoryStates);
 

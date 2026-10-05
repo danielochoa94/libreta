@@ -155,6 +155,9 @@ The page carries every view, its calculations and provenance, and the source ima
 It is a snapshot: it never reloads, and the status bar shows the date it was exported.
 The export refuses a book with a view that fails to load, rather than sharing a broken page.
 
+A link opens the page at a cell in its fragment, as `spacex.html#line=historical.segments.connectivity_revenue&column=2025`, choosing the view as `--cell` does.
+Changing the fragment of a page already open selects the new cell, so a page embedding the export in a frame can follow each link without reloading the book.
+
 The export icon at the foot of the navigation downloads this page or the [workbook](#export-a-workbook) from the running server, built from the book as it stands on disk.
 An exported page has no Export button, since it has no server to build one.
 

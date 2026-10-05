@@ -7,7 +7,12 @@ public record BookSnapshotPayload(
   ViewCatalog Catalog,
   Dictionary<string, ViewPayload> Views,
   Dictionary<string, string> Images,
+  Dictionary<string, PresentedLine> Lines,
   DateTimeOffset Exported);
+
+/// <summary>The first view in navigation order presenting a line, and for each column a different view presents first,
+/// that view: what <c>--cell</c> would open, for a page with no server to ask.</summary>
+public record PresentedLine(string View, Dictionary<string, string>? Columns);
 
 /// <summary>The whole book as one serverless page: every payload embedded and the page's files inlined.</summary>
 public static class HtmlExport
@@ -48,7 +53,20 @@ public static class HtmlExport
     }
     Dictionary<string, string> images = BookStore.SourceImages(book)
       .ToDictionary(image => image, image => DataUri(Path.Combine(root, image)));
-    return new BookSnapshotPayload(catalog, views, images, DateTimeOffset.Now);
+    return new BookSnapshotPayload(catalog, views, images, PresentedLines(book), DateTimeOffset.Now);
+  }
+
+  private static Dictionary<string, PresentedLine> PresentedLines(Book book)
+  {
+    return book.PresentedCoordinates.GroupBy(coordinate => coordinate.Line).ToDictionary(group => group.Key, group =>
+    {
+      string view = book.PresentingView(group.Key, null, "")!;
+      Dictionary<string, string> columns = group
+        .Select(coordinate => (coordinate.Column, View: book.PresentingView(coordinate.Line, coordinate.Column, "")!))
+        .Where(column => column.View != view)
+        .ToDictionary(column => column.Column, column => column.View);
+      return new PresentedLine(view, columns.Count == 0 ? null : columns);
+    });
   }
 
   private static string DataUri(string path)

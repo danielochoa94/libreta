@@ -83,6 +83,41 @@ public class HtmlExportTests
   }
 
   [Fact]
+  public void NamesTheViewPresentingEachLine()
+  {
+    // Arrange
+    using StoreFixture fixture = Fixture("analysis");
+
+    // Act
+    string html = HtmlExport.Build(fixture.Root, fixture.Assets);
+
+    // Assert
+    JsonElement revenue = Snapshot(html).GetProperty("lines").GetProperty("analysis.revenue");
+    revenue.GetProperty("view").GetString().ShouldBe("analysis");
+    revenue.TryGetProperty("columns", out _).ShouldBeFalse();
+  }
+
+  [Fact]
+  public void NamesTheViewPresentingAColumnTheLinesFirstViewLeavesOut()
+  {
+    // Arrange
+    using StoreFixture fixture = Fixture("analysis");
+    fixture.WriteSourceFragment();
+    fixture.Write("book.yaml",
+      "name: Test Book\nshort_name: TEST\nunits: millions\nnavigation:\n  - analysis\n  - later\n");
+    fixture.Write("later/view.yaml", "title: Later\ncolumns: [2025]\nrows:\n  - line: analysis.revenue\n");
+
+    // Act
+    string html = HtmlExport.Build(fixture.Root, fixture.Assets);
+
+    // Assert
+    JsonElement revenue = Snapshot(html).GetProperty("lines").GetProperty("analysis.revenue");
+    revenue.GetProperty("view").GetString().ShouldBe("analysis");
+    revenue.GetProperty("columns").GetProperty("2025").GetString().ShouldBe("later");
+    revenue.GetProperty("columns").TryGetProperty("2024", out _).ShouldBeFalse();
+  }
+
+  [Fact]
   public void RefusesABookThatFailsToLoad()
   {
     // Arrange

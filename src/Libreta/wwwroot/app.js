@@ -30,6 +30,8 @@ class RequestCoordinator {
 
 // An exported page carries the catalog, every view and the source images in place of the server.
 const snapshot = readSnapshot();
+// A page showing the export in a frame, such as a slide deck tracing a number, starts it on the table alone.
+const embedded = Boolean(snapshot) && window.parent !== window;
 const el = (id) => document.getElementById(id);
 // Held by reference: render() rebuilds the header row and re-appends it.
 const labelResizer = el('label-resizer');
@@ -47,7 +49,7 @@ let shortcutTimer = null;
 let inspectorDock = stored('inspectorDock') === 'bottom' ? 'bottom' : 'right';
 let uiScale = Number(stored('uiScale')) || 100;
 let theme = stored('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-let navigationVisible = stored('navigationVisible') !== 'false';
+let navigationVisible = !embedded && stored('navigationVisible') !== 'false';
 let checksExpanded = null;
 const requests = new RequestCoordinator();
 const branchStates = new Map();
@@ -123,7 +125,7 @@ function setTheme(next, persist = true) {
   if (persist) store('theme', theme);
 }
 
-function setNavigationVisible(visible, persist = true) {
+function setNavigationVisible(visible, persist = !embedded) {
   navigationVisible = visible;
   document.querySelector('.layout').classList.toggle('nav-hidden', !visible);
   const toggle = el('nav-toggle');
@@ -2772,7 +2774,7 @@ window.addEventListener('resize', () => {
   if (el('source-image-dialog').open) sizeSourceImageToFit();
 });
 document.addEventListener('keydown', handleGlobalKeydown);
-if (snapshot && window.parent !== window) {
+if (embedded) {
   document.addEventListener('keydown', (event) => {
     const overlayOpen = el('shortcuts-dialog').open || el('source-image-dialog').open ||
       el('export-menu').matches(':popover-open');

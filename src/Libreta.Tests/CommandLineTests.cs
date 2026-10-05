@@ -124,6 +124,107 @@ public class CommandLineTests
     checkOnly.Command.ShouldBe(HeadlessCommand.Check);
   }
 
+  [Fact]
+  public void ParsesLineNamesUpToTheNextOption()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--lines", "historical.segments.revenue", "dcf.wacc", "--json"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Lines);
+    options.Lines.ShouldBe(["historical.segments.revenue", "dcf.wacc"]);
+    options.Json.ShouldBeTrue();
+  }
+
+  [Fact]
+  public void ParsesTheCellALaunchOpensAt()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--cell", "historical.segments.ai_revenue", "H1 2026"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBeNull();
+    options.Cell.ShouldBe(("historical.segments.ai_revenue", "H1 2026"));
+  }
+
+  [Fact]
+  public void CellCannotCombineWithAHeadlessCommand()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--cell", "historical.segments.ai_revenue", "2025", "--list"];
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+
+    // Assert
+    exception.Message.ShouldBe("--cell opens the page, so it cannot be combined with a headless command.");
+  }
+
+  [Fact]
+  public void ACellLinkOpensTheViewPresentingItAndSelectsIt()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "statement.gross_profit", "2025");
+
+    // Assert
+    query.ShouldBe("/?view=statement&line=statement.gross_profit&column=2025");
+  }
+
+  [Fact]
+  public void ACellLinkResolvesInABookAlreadyLoaded()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+    Book book = Book.Load(fixture.Root);
+
+    // Act
+    RequestedCell cell = CellLink.Resolve(book, "statement.gross_profit", "2025");
+
+    // Assert
+    cell.ShouldBe(new RequestedCell("statement", "statement.gross_profit", "2025"));
+  }
+
+  [Fact]
+  public void ACellLinkToAnUnknownLineFails()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(
+      () => CellLink.Query(fixture.Root, "statement.net_income", "2025"));
+
+    // Assert
+    exception.Message.ShouldBe("Unknown line 'statement.net_income'.");
+  }
+
+  [Fact]
+  public void ParsesLinesWithNoNames()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--lines", "--json"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Command.ShouldBe(HeadlessCommand.Lines);
+    options.Lines.ShouldBeEmpty();
+    options.Json.ShouldBeTrue();
+  }
+
   [Theory]
   [InlineData("--docs", DocumentationTopic.Index)]
   [InlineData("--docs format", DocumentationTopic.Format)]
@@ -418,6 +519,41 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void CheckWarnsOfAFormulaPinnedToOneColumnInAScopeOfSeveral()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new(
+      """
+      formulas:
+        result:
+          formula: input["2025"] / input["2024"] - 1
+        growth:
+          formula: input / prior(input) - 1
+        total:
+          formula: sum(input["2024":"2025"])
+      """,
+      """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+        - line: growth
+        - line: total
+      """,
+      "line_item,2024,2025\ninput,1,2");
+
+    // Act
+    (int exitCode, string output) = RunCheck(fixture.Root, false);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    output.ShouldContain("repeated line: v.result, the same in every column");
+    output.ShouldContain("repeated line: v.total, the same in every column");
+    output.ShouldNotContain("repeated line: v.growth");
+    output.ShouldContain("2 repeated lines");
+  }
+
+  [Fact]
   public void CheckRunsEachExplicitCheckOnce()
   {
     // Arrange
@@ -508,6 +644,92 @@ public class CommandLineTests
     payload.TryGetProperty("formulas", out _).ShouldBeFalse();
     payload.TryGetProperty("version", out _).ShouldBeFalse();
     output.ShouldNotContain("unknown column");
+  }
+
+  [Fact]
+  public void ViewJsonMarksContraCellsWhoseExactValuesKeepTheirNaturalDirection()
+  {
+    // Arrange
+    using CheckBookFixture fixture = new("""
+      formulas:
+        result:
+          formula: 7
+          units: millions
+      """, """
+      title: Review
+      columns: [2024, 2025]
+      rows:
+        - line: result
+          sign: contra
+      """);
+
+    // Act
+    (int exitCode, string output) = Run(
+      fixture.Root, HeadlessCommand.View, new ViewQuery("v"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement row = document.RootElement.GetProperty("rows")[0];
+    row.GetProperty("exact").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "7", "7" });
+    row.GetProperty("display").EnumerateArray()
+      .Select(value => value.GetString()).ShouldBe(new[] { "(7.00)", "(7.00)" });
+    row.GetProperty("contra").EnumerateArray()
+      .Select(value => value.GetBoolean()).ShouldBe(new[] { true, true });
+    row.TryGetProperty("cells", out _).ShouldBeFalse();
+  }
+
+  [Fact]
+  public void ViewJsonNamesEachCellWhereItsRowAndColumnDoNot()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    (int exitCode, string output) = Run(fixture.Root, HeadlessCommand.View, new ViewQuery("comps"), true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement rows = document.RootElement.GetProperty("rows");
+    Cells(rows[0]).ShouldBe(new[]
+    {
+      ("alpha::metrics.revenue", "2025"), ("alpha::metrics.doubled", "alpha::metrics.double")
+    });
+    Cells(rows[3]).ShouldBe(new[]
+    {
+      ("comps.median.metrics.revenue", "2025"), ("comps.median.metrics.doubled", "double")
+    });
+  }
+
+  [Fact]
+  public void ACellLinkOpensACellOfAComparedBook()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "beta::metrics.doubled", "beta::metrics.double");
+
+    // Assert
+    query.ShouldBe("/?view=comps&line=beta%3A%3Ametrics.doubled&column=beta%3A%3Ametrics.double");
+  }
+
+  [Fact]
+  public void ACellLinkOpensACellOfAComparisonSummary()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    WriteComparisonWithMedian(fixture);
+
+    // Act
+    string query = CellLink.Query(fixture.Root, "comps.median.metrics.revenue", "2025");
+
+    // Assert
+    query.ShouldBe("/?view=comps&line=comps.median.metrics.revenue&column=2025");
   }
 
   [Fact]
@@ -649,29 +871,191 @@ public class CommandLineTests
     prior.GetProperty("missing").GetString().ShouldBe("no period before 2024");
   }
 
+  [Fact]
+  public void LinesJsonReadsEachLineByQualifiedNameAcrossItsPeriodsWithoutAView()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.connectivity", "historical.segments.total"], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement[] lines = document.RootElement.EnumerateArray().ToArray();
+    lines.Select(line => line.GetProperty("name").GetString())
+      .ShouldBe(["historical.segments.connectivity", "historical.segments.total"]);
+    JsonElement connectivity = lines[0];
+    connectivity.GetProperty("label").GetString().ShouldBe("Connectivity");
+    connectivity.GetProperty("kind").GetString().ShouldBe("fact");
+    connectivity.GetProperty("units").GetString().ShouldBe("millions");
+    connectivity.GetProperty("columns").EnumerateArray().Select(column => column.GetString())
+      .ShouldBe(["2024", "2025"]);
+    connectivity.GetProperty("exact").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["7.34", "11.5"]);
+    connectivity.GetProperty("display").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["7.3", "11.5"]);
+    JsonElement total = lines[1];
+    total.GetProperty("kind").GetString().ShouldBe("formula");
+    total.GetProperty("exact").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["9.34", "14.5"]);
+    total.TryGetProperty("unresolved", out _).ShouldBeFalse();
+  }
+
+  [Fact]
+  public void LinesReadAContraLineInItsNaturalDirection()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (_, string output) = RunLines(fixture.Root, ["historical.segments.cost"], true);
+
+    // Assert
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement cost = document.RootElement[0];
+    cost.GetProperty("contra").GetBoolean().ShouldBeTrue();
+    cost.GetProperty("exact").EnumerateArray().Select(value => value.GetString()).ShouldBe(["4", "5"]);
+    cost.GetProperty("display").EnumerateArray().Select(value => value.GetString()).ShouldBe(["4.0", "5.0"]);
+  }
+
+  [Fact]
+  public void LinesMarkAnUnresolvedCellWithoutFailing()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(fixture.Root, ["historical.segments.change"], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement change = document.RootElement[0];
+    change.GetProperty("exact")[0].ValueKind.ShouldBe(JsonValueKind.Null);
+    change.GetProperty("display").EnumerateArray().Select(value => value.GetString()).ShouldBe(["—", "5.2"]);
+    change.GetProperty("unresolved").EnumerateArray().Select(value => value.GetBoolean()).ShouldBe([true, false]);
+  }
+
+  [Fact]
+  public void LinesReportAnUnknownNameInPlaceAndExitNonZero()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.missing", "historical.segments.total"], true);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement missing = document.RootElement[0];
+    missing.GetProperty("name").GetString().ShouldBe("historical.segments.missing");
+    missing.GetProperty("error").GetString().ShouldBe("Unknown line 'historical.segments.missing'.");
+    missing.TryGetProperty("exact", out _).ShouldBeFalse();
+    document.RootElement[1].GetProperty("exact").GetArrayLength().ShouldBe(2);
+  }
+
+  [Fact]
+  public void LinesWithNoNamesReadEveryLineInOrderOfName()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(fixture.Root, [], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    document.RootElement.EnumerateArray().Select(line => line.GetProperty("name").GetString()).ShouldBe(
+      ["historical.segments.change", "historical.segments.connectivity", "historical.segments.cost",
+        "historical.segments.space", "historical.segments.total"]);
+  }
+
+  [Fact]
+  public void LinesPrintEachLineWithItsDisplayedValues()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.total", "historical.segments.missing"], false);
+
+    // Assert
+    exitCode.ShouldBe(1);
+    output.ShouldBe("""
+      historical.segments.total    2024 9.3, 2025 14.5
+      historical.segments.missing  error: Unknown line 'historical.segments.missing'.
+
+      """.ReplaceLineEndings());
+  }
+
   private static (int ExitCode, string Output) RunCheck(string root, bool json)
   {
     return Run(root, HeadlessCommand.Check, null, json);
+  }
+
+  private static (int ExitCode, string Output) RunLines(string root, List<string> lines, bool json)
+  {
+    return Run(root, HeadlessCommand.Lines, null, json, lines);
   }
 
   private static (int ExitCode, string Output) Run(
     string root,
     HeadlessCommand command,
     ViewQuery? query,
-    bool json)
+    bool json,
+    List<string>? lines = null)
   {
     TextWriter original = Console.Out;
     using var writer = new StringWriter();
     try
     {
       Console.SetOut(writer);
-      int exitCode = HeadlessRunner.Run(root, command, query, json);
+      int exitCode = HeadlessRunner.Run(root, command, query, json, lines);
       return (exitCode, writer.ToString());
     }
     finally
     {
       Console.SetOut(original);
     }
+  }
+
+  private static void WriteComparisonWithMedian(ViewFixture fixture)
+  {
+    fixture.WriteComparison();
+    fixture.Write("comps/median/metrics/formulas.yaml", """
+      formulas:
+        revenue:
+          formula: median(alpha::metrics.revenue["2025"], beta::metrics.revenue["2025"])
+        doubled:
+          formula: median(alpha::metrics.doubled["double"], beta::metrics.doubled["double"])
+      """);
+    fixture.Write("comps/view.yaml", """
+      title: Comparison
+      rows:
+        - book: alpha
+        - book: beta
+        - space: compact
+        - scope: median
+      columns:
+        - line: metrics.revenue
+          column: "2025"
+        - line: metrics.doubled
+          column: double
+      """);
+  }
+
+  private static (string Line, string Column)[] Cells(JsonElement row)
+  {
+    return row.GetProperty("cells").EnumerateArray()
+      .Select(cell => (cell.GetProperty("line").GetString()!, cell.GetProperty("column").GetString()!))
+      .ToArray();
   }
 
 
@@ -726,6 +1110,47 @@ public class CommandLineTests
         checks:
           sum:
             formula: 1 + 2 - result
+        """);
+    }
+
+
+  }
+
+  /// <summary>Facts and formulas in a folder no view presents, so its lines are reached only by name.</summary>
+  private sealed class LinesBookFixture : TempFolder
+  {
+    public LinesBookFixture()
+    {
+      Write("book.yaml", "name: Lines\nshort_name: Lines\nnavigation: []");
+      Write("formats.yaml", "defaults:\n  unresolved: \"—\"\nformats:\n  millions:\n    decimals: 1");
+      Write("historical/segments/facts/segments.csv", """
+        line_item,2024,2025
+        space,2,3
+        connectivity,7.34,11.5
+        cost,4,5
+        """);
+      Write("historical/segments/facts/segments.yaml", """
+        table:
+          title: Segments
+        defaults:
+          units: millions
+        line_items:
+          space:
+            label: Space
+          connectivity:
+            label: Connectivity
+          cost:
+            label: Cost
+            sign: contra
+        """);
+      Write("historical/segments/formulas.yaml", """
+        formulas:
+          total:
+            formula: space + connectivity
+            units: millions
+          change:
+            formula: total - prior(total)
+            units: millions
         """);
     }
 

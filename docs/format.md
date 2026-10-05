@@ -348,6 +348,24 @@ formulas:
 `self` means the line at the current row and is useful in [calculated columns](#calculated-columns-and-cell-overrides).
 A scope prefix such as `interim.self` means the same line in another folder, which is how a column bridges figures a sub-folder holds under matching line names.
 
+### Single values
+
+A figure that holds once rather than per period, such as an assumption, a valuation, or `change` above, lives in a folder of one column, conventionally `Value`, as the DCF's inputs do.
+Facts get there with a `Value` header in their CSV; a folder of formulas alone sets its one column with `columns: [Value]` in its `view.yaml`, since a folder with no periods of its own inherits its parent's.
+
+```yaml
+# historical/summary/view.yaml
+title: Summary
+columns: [Value]
+
+# historical/summary/formulas.yaml
+formulas:
+  revenue_change:
+    formula: historical.revenue["2025"] - historical.revenue["2023"]
+```
+
+A formula whose every reference names its column has the same value in every column of its folder, so in a folder of periods it repeats one figure under each, and `--check` reports it as a repeated line.
+
 ### Operators and functions
 
 The formula language supports numeric literals, parentheses, `+`, `-`, `*`, `/`, and `^`.

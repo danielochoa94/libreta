@@ -1,11 +1,14 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Libreta;
 
 public record ViewQuery(string ViewId, string? Line = null, string? Column = null);
 
 public record ViewTableColumnPayload(string Name, string Label);
+
+public record ViewTableCellPayload(string Line, string Column);
 
 public record ViewTableRowPayload
 {
@@ -18,6 +21,11 @@ public record ViewTableRowPayload
   public List<string?>? Exact { get; init; }
   public List<string>? Display { get; init; }
   public List<bool>? Unresolved { get; init; }
+  /// <summary>Per cell, whether the view shows it negated; <c>Exact</c> stays in natural direction.</summary>
+  public List<bool>? Contra { get; init; }
+  /// <summary>Per cell, the book cell it shows, given only when one isn't the row's line in its column's period, as
+  /// in a comparison, whose rows are books, or a transposed view.</summary>
+  public List<ViewTableCellPayload>? Cells { get; init; }
 }
 
 public record ViewTablePayload(
@@ -68,7 +76,23 @@ public record ValuePayload
   public List<ValueCellPayload>? Dependents { get; init; }
 }
 
-public enum HeadlessCommand { List, View, Value, Check, Export, Url }
+/// <summary>A line as a caller outside Libreta reads it, over every period its scope has, in natural direction even
+/// when <c>Contra</c> has views show it negated.</summary>
+public record LinePayload
+{
+  public string Name { get; init; } = "";
+  public string? Error { get; init; }
+  public string? Label { get; init; }
+  public string? Kind { get; init; }
+  public string? Units { get; init; }
+  public bool? Contra { get; init; }
+  public List<string>? Columns { get; init; }
+  public List<string?>? Exact { get; init; }
+  public List<string>? Display { get; init; }
+  public List<bool>? Unresolved { get; init; }
+}
+
+public enum HeadlessCommand { List, View, Value, Lines, Check, Export, Url }
 
 public enum DocumentationTopic { Index, Format, Running }
 
@@ -81,6 +105,9 @@ public class CommandLineOptions
   public bool PortSpecified { get; private init; }
   public HeadlessCommand? Command { get; private init; }
   public ViewQuery? Query { get; private init; }
+  public List<string>? Lines { get; private init; }
+  /// <summary>The cell a launch opens the page at, by qualified line and column name.</summary>
+  public (string Line, string Column)? Cell { get; private init; }
   public string? Output { get; private init; }
   public bool Json { get; private init; }
   public bool Help { get; private init; }
@@ -100,6 +127,8 @@ public class CommandLineOptions
     bool portSpecified = false;
     HeadlessCommand? command = null;
     ViewQuery? query = null;
+    List<string>? lines = null;
+    (string, string)? cell = null;
     string? output = null;
     bool json = false;
     DocumentationTopic? documentation = null;
@@ -132,6 +161,17 @@ public class CommandLineOptions
           command = HeadlessCommand.Value;
           query = new ViewQuery(arguments[index + 1], arguments[index + 2], arguments[index + 3]);
           index += 3;
+          break;
+        case "--lines":
+          RequireNoCommand(command, argument);
+          command = HeadlessCommand.Lines;
+          lines = arguments.Skip(index + 1).TakeWhile(name => !name.StartsWith('-')).ToList();
+          index += lines.Count;
+          break;
+        case "--cell":
+          Require(arguments, index, 2);
+          cell = (arguments[index + 1], arguments[index + 2]);
+          index += 2;
           break;
         case "--check":
           RequireNoCommand(command, argument);
@@ -183,14 +223,18 @@ public class CommandLineOptions
     if (command is not null && portSpecified)
     {
       throw new ArgumentException(
-        "--port cannot be combined with --list, --view, --value, --check, --export or --url.");
+        "--port cannot be combined with --list, --view, --value, --lines, --check, --export or --url.");
     }
     if ((command is null or HeadlessCommand.Export or HeadlessCommand.Url) && json)
     {
-      throw new ArgumentException("--json requires --list, --view, --value or --check.");
+      throw new ArgumentException("--json requires --list, --view, --value, --lines or --check.");
+    }
+    if (cell is not null && command is not null)
+    {
+      throw new ArgumentException("--cell opens the page, so it cannot be combined with a headless command.");
     }
     if (documentation is not null &&
-      (root is not null || command is not null || portSpecified || json))
+      (root is not null || command is not null || portSpecified || json || cell is not null))
     {
       throw new ArgumentException("--docs cannot be combined with a book root or another option.");
     }
@@ -201,6 +245,8 @@ public class CommandLineOptions
       PortSpecified = portSpecified,
       Command = command,
       Query = query,
+      Lines = lines,
+      Cell = cell,
       Output = output,
       Json = json,
       Documentation = documentation
@@ -211,9 +257,11 @@ public class CommandLineOptions
   {
     writer.WriteLine("usage:");
     writer.WriteLine("  libreta [<book-root>] [--port <n>]   (without --port, the first free port from 5173)");
+    writer.WriteLine("  libreta [<book-root>] --cell <line> <column>   (the page at a cell, by qualified line name)");
     writer.WriteLine("  libreta [<book-root>] --list [--json]");
     writer.WriteLine("  libreta [<book-root>] --view <view-id> [--json]");
     writer.WriteLine("  libreta [<book-root>] --value <view-id> <line> <column> [--json]");
+    writer.WriteLine("  libreta [<book-root>] --lines [<line>...] [--json]   (lines by qualified name, or every line)");
     writer.WriteLine("  libreta [<book-root>] --check [--json]");
     writer.WriteLine("  libreta [<book-root>] --export <file.html>   (the whole book as one self-contained page)");
     writer.WriteLine("  libreta [<book-root>] --export <file.xlsx>   (the whole book as a workbook, a sheet per view)");
@@ -238,7 +286,8 @@ public class CommandLineOptions
     if (command is not null)
     {
       throw new ArgumentException(
-        $"Use only one of --list, --view, --value, --check, --export or --url; found '{argument}' after another.");
+        $"Use only one of --list, --view, --value, --lines, --check, --export or --url; found '{argument}' after " +
+        "another.");
     }
   }
 
@@ -295,6 +344,35 @@ public static class BookDiscovery
 
 }
 
+public record RequestedCell(string View, string Line, string Column)
+{
+  [JsonIgnore]
+  public string Query => $"/?view={Uri.EscapeDataString(View)}&line={Uri.EscapeDataString(Line)}&column=" +
+    Uri.EscapeDataString(Column);
+}
+
+public record CellAnswer(string Query, int Pages);
+
+public static class CellLink
+{
+  /// <summary>The page's query for a cell: the first view in navigation order presenting it, or failing that its
+  /// line, with the cell to select.</summary>
+  public static string Query(string root, string name, string column)
+  {
+    return Resolve(Book.Load(root), name, column).Query;
+  }
+
+  public static RequestedCell Resolve(Book book, string name, string column)
+  {
+    string line = book.Resolve(name, "") ?? throw new ArgumentException($"Unknown line '{name}'.");
+    string view = book.PresentingView(line, column, "") ?? book.PresentingView(line, null, "") ??
+      throw new ArgumentException($"No view presents '{name}'.");
+    return new RequestedCell(view, line, column);
+  }
+
+
+}
+
 public static class HeadlessRunner
 {
   // The default encoder escapes formula punctuation like + and ' for embedding in HTML, which a terminal never needs.
@@ -309,11 +387,13 @@ public static class HeadlessRunner
     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
   };
 
-  public static int Run(string root, HeadlessCommand command, ViewQuery? query, bool json)
+  public static int Run(
+    string root, HeadlessCommand command, ViewQuery? query, bool json, IReadOnlyList<string>? lines = null)
   {
     return command switch
     {
       HeadlessCommand.List => RunList(root, json),
+      HeadlessCommand.Lines => RunLines(root, lines!, json),
       HeadlessCommand.Check => RunCheck(root, json),
       HeadlessCommand.View or HeadlessCommand.Value => RunView(root, query!, json),
       _ => throw new ArgumentOutOfRangeException(nameof(command), command, "not a console command")
@@ -333,6 +413,81 @@ public static class HeadlessRunner
       Console.WriteLine(entry.Id);
     }
     return 0;
+  }
+
+  /// <summary>Loads the book once for every line, so a caller reading many pays one start, and reads every line in the
+  /// book when no name is given. Exits non-zero only when a name is unknown or fails to evaluate; a cell with no value
+  /// is marked, not a failure.</summary>
+  private static int RunLines(string root, IReadOnlyList<string> names, bool json)
+  {
+    Book book = Book.Load(root);
+    var views = new Dictionary<string, (View View, Engine Engine)>();
+    IEnumerable<string> asked = names.Count > 0
+      ? names
+      : book.Facts.Keys.Concat(book.Formulas.Keys).Distinct().Order(StringComparer.Ordinal);
+    List<LinePayload> lines = asked.Select(name => ReadLine(book, views, name)).ToList();
+    if (json)
+    {
+      Console.WriteLine(JsonSerializer.Serialize(lines, JsonOptions));
+    }
+    else
+    {
+      int width = lines.Select(line => line.Name.Length).DefaultIfEmpty().Max();
+      foreach (LinePayload line in lines)
+      {
+        string values = line.Error is not null
+          ? $"error: {line.Error}"
+          : string.Join(", ", line.Columns!.Zip(line.Display!, (column, display) => $"{column} {display}"));
+        Console.WriteLine($"{line.Name.PadRight(width)}  {values}");
+      }
+    }
+    return lines.Any(line => line.Error is not null) ? 1 : 0;
+  }
+
+  private static LinePayload ReadLine(Book book, Dictionary<string, (View View, Engine Engine)> views, string name)
+  {
+    string? line = book.Resolve(name, "");
+    if (line is null)
+    {
+      return new LinePayload { Name = name, Error = $"Unknown line '{name}'." };
+    }
+    try
+    {
+      book.Facts.TryGetValue(line, out Fact? fact);
+      string scope = fact?.Scope ?? book.Formulas[line].Scope;
+      // Each scope formats with the formats.yaml nearest its folder, as a view there would.
+      if (!views.TryGetValue(scope, out (View View, Engine Engine) scoped))
+      {
+        View view = View.ForCheckScope(book, book.FoldersByScope[scope]);
+        scoped = (view, new Engine(view));
+        views[scope] = scoped;
+      }
+      List<string> columns = book.PeriodsFor(scope);
+      List<ResolvedCell> cells = columns
+        .Select(column => scoped.Engine.Cell(new CellCoordinate(line, column)))
+        .ToList();
+      Formatter formatter = scoped.View.Formatter;
+      return new LinePayload
+      {
+        Name = name,
+        Label = scoped.View.LabelOf(line),
+        Kind = fact is null ? "formula" : "fact",
+        Units = scoped.Engine.Units(line) ?? formatter.DefaultUnits,
+        Contra = fact?.Contra == true ? true : null,
+        Columns = columns,
+        Exact = cells
+          .Select(cell => cell.Value is null ? null : formatter.Exact(cell.Units, cell.Value.Value))
+          .ToList(),
+        Display = cells.Select(cell => cell.Value is null
+          ? formatter.Unresolved
+          : PayloadBuilder.Display(scoped.View, cell, false)).ToList(),
+        Unresolved = cells.Any(cell => cell.Value is null) ? cells.Select(cell => cell.Value is null).ToList() : null
+      };
+    }
+    catch (Exception exception) when (exception is InvalidDataException or InvalidOperationException)
+    {
+      return new LinePayload { Name = name, Error = exception.Message };
+    }
   }
 
   /// <summary>Every check in one pass, exiting non-zero on a failure, view error or missing line so a script can gate
@@ -394,6 +549,12 @@ public static class HeadlessRunner
     int failed = checkedViews.Sum(view => view.Checks.Count(check => !check.Passed));
     int errors = checkedViews.Count(view => view.Error is not null);
     int missingLines = checkedViews.Sum(view => view.Missing.Count);
+    // A formula pinned to one column repeats its value under every column of its scope.
+    List<string> repeated = book.Formulas.Values
+      .Where(formula => Expr.Pinned(formula.Expression) && book.PeriodsFor(formula.Scope).Count > 1)
+      .Select(formula => formula.Name)
+      .Order(StringComparer.Ordinal)
+      .ToList();
     bool ok = failed == 0 && errors == 0 && missingLines == 0;
 
     if (json)
@@ -406,7 +567,8 @@ public static class HeadlessRunner
           Failed = failed,
           Errors = errors,
           MissingLines = missingLines,
-          Views = checkedViews
+          Views = checkedViews,
+          Repeated = repeated
         },
         JsonOptions));
       return ok ? 0 : 1;
@@ -425,9 +587,14 @@ public static class HeadlessRunner
         Console.WriteLine($"    missing line: {line}");
       }
     }
+    foreach (string line in repeated)
+    {
+      Console.WriteLine($"repeated line: {line}, the same in every column; move it to a folder of one column");
+    }
     Console.WriteLine();
     Console.WriteLine($"{passed + failed} checks in {checkedViews.Count} views: {passed} passed, {failed} failed, " +
-      $"{errors} {Plural(errors, "view")} in error, {missingLines} missing {Plural(missingLines, "line")}");
+      $"{errors} {Plural(errors, "view")} in error, {missingLines} missing {Plural(missingLines, "line")}" +
+      (repeated.Count == 0 ? "" : $", {repeated.Count} repeated {Plural(repeated.Count, "line")}"));
     return ok ? 0 : 1;
   }
 
@@ -600,7 +767,7 @@ public static class ViewTablePayloadBuilder
     List<ViewTableColumnPayload> columns = payload.Columns
       .Select(column => new ViewTableColumnPayload(column.Name, column.Label))
       .ToList();
-    List<ViewTableRowPayload> rows = payload.Rows.Select(Row).ToList();
+    List<ViewTableRowPayload> rows = payload.Rows.Select(row => Row(row, columns)).ToList();
     return new ViewTablePayload(
       id,
       payload.Title,
@@ -611,9 +778,11 @@ public static class ViewTablePayloadBuilder
       payload.Sensitivities);
   }
 
-  private static ViewTableRowPayload Row(RowPayload row)
+  private static ViewTableRowPayload Row(RowPayload row, List<ViewTableColumnPayload> columns)
   {
     bool hasCells = row.Cells.Count > 0;
+    bool elsewhere = row.Cells.Where((cell, index) => cell.Line != row.Name || cell.Column != columns[index].Name)
+      .Any();
     return new ViewTableRowPayload
     {
       Name = Present(row.Name),
@@ -626,7 +795,9 @@ public static class ViewTablePayloadBuilder
       Display = hasCells ? row.Cells.Select(cell => cell.Display).ToList() : null,
       Unresolved = row.Cells.Any(cell => cell.Unresolved)
         ? row.Cells.Select(cell => cell.Unresolved).ToList()
-        : null
+        : null,
+      Contra = row.Cells.Any(cell => cell.Contra) ? row.Cells.Select(cell => cell.Contra).ToList() : null,
+      Cells = elsewhere ? row.Cells.Select(cell => new ViewTableCellPayload(cell.Line, cell.Column)).ToList() : null
     };
   }
 

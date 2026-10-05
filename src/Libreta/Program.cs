@@ -480,9 +480,31 @@ public class BookStore : IDisposable
   /// <summary>The last book that loaded, kept through a load that fails.</summary>
   public Book? Book => Volatile.Read(ref snapshot).Book;
 
+  /// <summary>A view of the book's, or a line no table shows, built on request since only a link reaches one.
+  /// </summary>
   public bool TryGetView(string id, out ViewPayload? payload)
   {
-    return Volatile.Read(ref snapshot).Views.TryGetValue(id, out payload);
+    BookSnapshot current = Volatile.Read(ref snapshot);
+    if (current.Views.TryGetValue(id, out payload))
+    {
+      return true;
+    }
+    string line = id.StartsWith(View.LinePrefix, StringComparison.Ordinal) ? id[View.LinePrefix.Length..] : "";
+    if (current.Book is not Book book || !(book.Formulas.ContainsKey(line) || book.Facts.ContainsKey(line)))
+    {
+      return false;
+    }
+    long built = current.Catalog.Version;
+    try
+    {
+      View view = View.ForLine(book, line);
+      payload = PayloadBuilder.Build(view, new Engine(view), built);
+    }
+    catch (Exception exception)
+    {
+      payload = new ViewPayload { Title = line, Error = exception.Message, Version = built };
+    }
+    return true;
   }
 
   public bool TryGetSourceImage(string image, out string? path, out string? contentType)

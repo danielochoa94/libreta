@@ -225,6 +225,58 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void ACellLinkToALineNoViewPresentsOpensTheLineOnItsOwn()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+    fixture.Write("statement/formulas.yaml", """
+      formulas:
+        gross_profit:
+          formula: revenue - cost_of_revenue
+        gross_margin:
+          label: Gross margin
+          formula: gross_profit / revenue
+      """);
+    Book book = Book.Load(fixture.Root);
+
+    // Act
+    RequestedCell cell = CellLink.Resolve(book, "statement.gross_margin", "2025");
+
+    // Assert
+    cell.ShouldBe(new RequestedCell("line:statement.gross_margin", "statement.gross_margin", "2025"));
+  }
+
+  [Fact]
+  public void ALineOnItsOwnShowsItAboveTheLinesItReads()
+  {
+    // Arrange
+    using var fixture = new ViewFixture();
+    fixture.WriteStatement();
+    fixture.Write("statement/formulas.yaml", """
+      formulas:
+        gross_profit:
+          formula: revenue - cost_of_revenue
+        gross_margin:
+          label: Gross margin
+          formula: gross_profit / revenue
+      """);
+    Book book = Book.Load(fixture.Root);
+
+    // Act
+    Libreta.View view = Libreta.View.ForLine(book, "statement.gross_margin");
+    ViewPayload payload = PayloadBuilder.Build(view, new Engine(view), 1);
+
+    // Assert
+    view.Id.ShouldBe("line:statement.gross_margin");
+    payload.Title.ShouldBe("Gross margin");
+    payload.Columns.Select(column => column.Name).ShouldBe(["2024", "2025"]);
+    payload.Rows.Select(row => row.Name)
+      .ShouldBe(["statement.gross_margin", "", "statement.gross_profit", "statement.revenue"]);
+    payload.Rows[1].Label.ShouldBe("Reads");
+  }
+
+  [Fact]
   public void ACellLinkToAnUnknownLineFails()
   {
     // Arrange

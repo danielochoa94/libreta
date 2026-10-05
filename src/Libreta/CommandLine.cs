@@ -374,8 +374,8 @@ public record CellPage(string Url, int Pages);
 
 public static class CellLink
 {
-  /// <summary>The page's query for a cell: the first view in navigation order presenting it, or failing that its
-  /// line, with the cell to select.</summary>
+  /// <summary>The page's query for a cell: the first view in navigation order presenting it, or failing that the
+  /// line on its own, with the cell to select.</summary>
   public static string Query(string root, string name, string column)
   {
     return Resolve(Book.Load(root), name, column).Query;
@@ -385,7 +385,7 @@ public static class CellLink
   {
     string line = book.Resolve(name, "") ?? throw new ArgumentException($"Unknown line '{name}'.");
     string view = book.PresentingView(line, column, "") ?? book.PresentingView(line, null, "") ??
-      throw new ArgumentException($"No view presents '{name}'.");
+      $"{View.LinePrefix}{line}";
     return new RequestedCell(view, line, column);
   }
 

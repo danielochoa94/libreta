@@ -450,7 +450,11 @@ function expandAncestors(id) {
   }
 }
 
+// A line no table shows has a view of its own, which the server builds on request and an export carries.
+const LINE_VIEW = 'line:';
+
 function knownView(id) {
+  if (id?.startsWith(LINE_VIEW)) return !snapshot || Boolean(snapshot.views[id]);
   return catalog?.views.some((view) => view.id === id) ?? false;
 }
 
@@ -1811,16 +1815,16 @@ function renderPanel() {
   bindInspectorInputs(panel);
 }
 
-// A dependent no table shows has nowhere to open, so it is not a link.
+// A dependent no table shows opens on a view of its own.
 function renderDependents(dependents) {
   if (!dependents?.length) return '';
   const rows = dependents.map((dependent) => {
     const label = escapeHtml(dependent.label);
-    const name = dependent.hidden ? `<span class="dependent-hidden" title="Not shown in any table">${label}</span>`
-      : `<button type="button" class="dep" data-name="${escapeHtml(dependent.line)}" ` +
-        `data-column-key="${escapeHtml(dependent.column)}" ` +
-        `data-source-view="${escapeHtml(dependent.sourceView ?? '')}" ` +
-        `title="Open ${label} · ${escapeHtml(dependent.columnLabel)}">${label}</button>`;
+    const view = dependent.hidden ? `${LINE_VIEW}${dependent.line}` : dependent.sourceView ?? '';
+    const name = `<button type="button" class="dep${dependent.hidden ? ' dependent-hidden' : ''}" ` +
+      `data-name="${escapeHtml(dependent.line)}" data-column-key="${escapeHtml(dependent.column)}" ` +
+      `data-source-view="${escapeHtml(view)}" title="Open ${label} · ${escapeHtml(dependent.columnLabel)}` +
+      `${dependent.hidden ? ', which no table shows' : ''}">${label}</button>`;
     return `<tr><th>${name}</th><td class="dependent-column">${escapeHtml(dependent.columnLabel)}</td>` +
       `<td class="${escapeHtml(dependent.kind)}">${escapeHtml(dependent.value)}</td></tr>`;
   }).join('');

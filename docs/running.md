@@ -43,6 +43,20 @@ The page shows the first view in navigation order that presents the cell, or fai
 When a server already runs the book with a page open, that page selects the cell instead of a new tab opening.
 Browsers keep a page from bringing its own tab forward, so a page in a background tab selects the cell there.
 
+A tool that can bring a tab forward, such as a page whose click opened the book's tab, opens the page itself:
+
+```bash
+libreta books/spacex --cell historical.segments.connectivity_revenue 2025 --no-open --json
+```
+
+`--no-open` opens no tab, starting a server if none runs, and `--json` prints one line with the page's address at the cell and how many open pages selected it:
+
+```json
+{"url":"http://localhost:5173/?view=historical%2Fsegments&line=historical.segments.connectivity_revenue&column=2025","pages":1}
+```
+
+A server started with `--no-open` stops ten seconds later if no page has connected.
+
 The server stops about ten seconds after its last tab closes, long enough for a reload to reconnect.
 It keeps running until a first tab connects, and `Ctrl+C` stops it at any time.
 The command always prints the address as well, for sessions with no browser to open, such as over SSH.

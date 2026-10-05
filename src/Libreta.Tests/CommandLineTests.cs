@@ -154,6 +154,35 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void ParsesACellForAToolThatOpensThePageItself()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--cell", "historical.segments.ai_revenue", "2025", "--no-open", "--json"];
+
+    // Act
+    CommandLineOptions options = CommandLineOptions.Parse(arguments);
+
+    // Assert
+    options.Cell.ShouldBe(("historical.segments.ai_revenue", "2025"));
+    options.NoOpen.ShouldBeTrue();
+    options.Json.ShouldBeTrue();
+  }
+
+  [Fact]
+  public void NoOpenCannotCombineWithAHeadlessCommand()
+  {
+    // Arrange
+    string[] arguments = ["books/spacex", "--check", "--no-open"];
+
+    // Act
+    ArgumentException exception = Should.Throw<ArgumentException>(() => CommandLineOptions.Parse(arguments));
+
+    // Assert
+    exception.Message.ShouldBe("--no-open leaves the server's page to the caller, so it cannot be combined with a " +
+      "headless command.");
+  }
+
+  [Fact]
   public void CellCannotCombineWithAHeadlessCommand()
   {
     // Arrange

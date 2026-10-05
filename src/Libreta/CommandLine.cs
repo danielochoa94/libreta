@@ -108,6 +108,8 @@ public class CommandLineOptions
   public List<string>? Lines { get; private init; }
   /// <summary>The cell a launch opens the page at, by qualified line and column name.</summary>
   public (string Line, string Column)? Cell { get; private init; }
+  /// <summary>The caller opens the page itself, so the server opens no tab, and stops if no page comes.</summary>
+  public bool NoOpen { get; private init; }
   public string? Output { get; private init; }
   public bool Json { get; private init; }
   public bool Help { get; private init; }
@@ -129,6 +131,7 @@ public class CommandLineOptions
     ViewQuery? query = null;
     List<string>? lines = null;
     (string, string)? cell = null;
+    bool noOpen = false;
     string? output = null;
     bool json = false;
     DocumentationTopic? documentation = null;
@@ -172,6 +175,9 @@ public class CommandLineOptions
           Require(arguments, index, 2);
           cell = (arguments[index + 1], arguments[index + 2]);
           index += 2;
+          break;
+        case "--no-open":
+          noOpen = true;
           break;
         case "--check":
           RequireNoCommand(command, argument);
@@ -225,13 +231,18 @@ public class CommandLineOptions
       throw new ArgumentException(
         "--port cannot be combined with --list, --view, --value, --lines, --check, --export or --url.");
     }
-    if ((command is null or HeadlessCommand.Export or HeadlessCommand.Url) && json)
+    if ((command is HeadlessCommand.Export or HeadlessCommand.Url || command is null && cell is null) && json)
     {
-      throw new ArgumentException("--json requires --list, --view, --value, --lines or --check.");
+      throw new ArgumentException("--json requires --list, --view, --value, --lines, --check or --cell.");
     }
     if (cell is not null && command is not null)
     {
       throw new ArgumentException("--cell opens the page, so it cannot be combined with a headless command.");
+    }
+    if (noOpen && command is not null)
+    {
+      throw new ArgumentException(
+        "--no-open leaves the server's page to the caller, so it cannot be combined with a headless command.");
     }
     if (documentation is not null &&
       (root is not null || command is not null || portSpecified || json || cell is not null))
@@ -247,6 +258,7 @@ public class CommandLineOptions
       Query = query,
       Lines = lines,
       Cell = cell,
+      NoOpen = noOpen,
       Output = output,
       Json = json,
       Documentation = documentation
@@ -256,8 +268,10 @@ public class CommandLineOptions
   public static void PrintUsage(TextWriter writer)
   {
     writer.WriteLine("usage:");
-    writer.WriteLine("  libreta [<book-root>] [--port <n>]   (without --port, the first free port from 5173)");
-    writer.WriteLine("  libreta [<book-root>] --cell <line> <column>   (the page at a cell, by qualified line name)");
+    writer.WriteLine("  libreta [<book-root>] [--port <n>] [--no-open]   (without --port, the first free port from " +
+      "5173)");
+    writer.WriteLine("  libreta [<book-root>] --cell <line> <column> [--no-open] [--json]   (the page at a cell, by " +
+      "qualified line name; --json prints its address and how many open pages selected it)");
     writer.WriteLine("  libreta [<book-root>] --list [--json]");
     writer.WriteLine("  libreta [<book-root>] --view <view-id> [--json]");
     writer.WriteLine("  libreta [<book-root>] --value <view-id> <line> <column> [--json]");
@@ -270,6 +284,7 @@ public class CommandLineOptions
     writer.WriteLine();
     writer.WriteLine("without a book root, the one book up to three folders below the working folder");
     writer.WriteLine("the server opens a browser tab, reuses one already serving the book, and stops with no tab open");
+    writer.WriteLine("--no-open leaves opening the page to the caller, as a tool linking to the book does");
   }
 
   private static void Require(string[] arguments, int optionIndex, int valueCount)
@@ -352,6 +367,10 @@ public record RequestedCell(string View, string Line, string Column)
 }
 
 public record CellAnswer(string Query, int Pages);
+
+/// <summary>What <c>--cell --json</c> prints: the page's address at the cell, and how many open pages selected it.
+/// </summary>
+public record CellPage(string Url, int Pages);
 
 public static class CellLink
 {

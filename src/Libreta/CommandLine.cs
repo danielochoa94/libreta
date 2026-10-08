@@ -481,8 +481,20 @@ public static class HeadlessRunner
         scoped = (view, new Engine(view));
         views[scope] = scoped;
       }
-      List<string> columns = book.PeriodsFor(scope);
-      List<ResolvedCell> cells = columns
+      List<string> periods = book.PeriodsFor(scope);
+      // Calculated columns follow the periods, by the names a reference writes them with.
+      List<(string Name, string Column)> calculated = book.ColumnFormulas.Values
+        .Select(formula => formula.Key)
+        .Distinct()
+        .Where(key => !periods.Contains(key))
+        .Select(key => (Name: key, Column: book.ResolveColumn(key, scope)))
+        .Where(column => column.Column is string resolved &&
+          (!book.ColumnFormulas[resolved].FactsOnly || fact is not null))
+        .Select(column => (column.Name, column.Column!))
+        .ToList();
+      List<string> columns = [.. periods, .. calculated.Select(column => column.Name)];
+      List<ResolvedCell> cells = periods
+        .Concat(calculated.Select(column => column.Column))
         .Select(column => scoped.Engine.Cell(new CellCoordinate(line, column)))
         .ToList();
       Formatter formatter = scoped.View.Formatter;

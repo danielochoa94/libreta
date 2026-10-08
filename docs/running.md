@@ -112,7 +112,7 @@ Print the engine's exact, unrounded value for one presented cell:
 libreta books/spacex --value dcf value_per_share Value
 ```
 
-Print several lines by qualified name, each over every period its folder has, whether or not a view presents it:
+Print several lines by qualified name, each over every period its folder has and then every column formula that applies to it, whether or not a view presents it:
 
 ```bash
 libreta books/spacex --lines historical.segments.connectivity_revenue historical.segments.connectivity_share_of_revenue

@@ -1041,6 +1041,35 @@ public class CommandLineTests
   }
 
   [Fact]
+  public void LinesReadTheCalculatedColumnsThatApplyToThemAfterTheirPeriods()
+  {
+    // Arrange
+    using LinesBookFixture fixture = new();
+    fixture.Write("historical/formulas.yaml", """
+      column_formulas:
+        growth:
+          label: Growth
+          formula: self["2025"] - self["2024"]
+          applies_to: facts
+      """);
+
+    // Act
+    (int exitCode, string output) = RunLines(
+      fixture.Root, ["historical.segments.connectivity", "historical.segments.total"], true);
+
+    // Assert
+    exitCode.ShouldBe(0);
+    using JsonDocument document = JsonDocument.Parse(output);
+    JsonElement connectivity = document.RootElement[0];
+    connectivity.GetProperty("columns").EnumerateArray().Select(column => column.GetString())
+      .ShouldBe(["2024", "2025", "growth"]);
+    connectivity.GetProperty("exact").EnumerateArray().Select(value => value.GetString())
+      .ShouldBe(["7.34", "11.5", "4.16"]);
+    document.RootElement[1].GetProperty("columns").EnumerateArray().Select(column => column.GetString())
+      .ShouldBe(["2024", "2025"]);
+  }
+
+  [Fact]
   public void LinesWithNoNamesReadEveryLineInOrderOfName()
   {
     // Arrange

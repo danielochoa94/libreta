@@ -56,6 +56,8 @@ public class Formula
 public class ColumnFormula
 {
   public string Name { get; set; } = "";
+  /// <summary>The name as written in its file, which a reference resolves from any scope it covers.</summary>
+  public string Key { get; set; } = "";
   public string Label { get; set; } = "";
   public string Scope { get; set; } = "";
   public Expr Expression { get; set; } = null!;
@@ -169,6 +171,7 @@ public class Book
         Add(book.ColumnFormulas, name, new ColumnFormula
         {
           Name = name,
+          Key = entry.Key,
           Label = entry.Value.Label,
           Scope = scope,
           Expression = expression,
